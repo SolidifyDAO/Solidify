@@ -1,0 +1,34 @@
+Ganache CLI v6.0.3 (ganache-core: 2.0.2)
+
+Available Accounts
+==================
+(0) 0xdd8bcad9d12fc024c63cd93dbf78c763f1ab4f68
+(1) 0x4f046a9df79ebc1e68b5fabb0423832c529ad1d1
+(2) 0x144c7f1415f9857f3043afde57c58a272c11c23d
+(3) 0x0bfcd38b378c412fbec3da24bf94bf8273708d26
+(4) 0x854431e1d7debc3231487d623b2cb14f3f290781
+(5) 0xbf6bc5665e6096d98f050481dfc3150991007a0f
+(6) 0xd41dd872f8b0a1f6da55484f95024384f47e1888
+(7) 0xc6d4f62fc1412ee8bdc64840cfd0ef41f7a5b21e
+(8) 0xc1906f0e80a16313e19fd778a60de7bef95c902d
+(9) 0xa5a133243b35207f4aa45146b3d23cc3d176cfa3
+
+Private Keys
+==================
+(0) 2ca8bd0b60ad56bc4bea3a501852cfeac69d63883cd6ca6352aaefbc21db3468
+(1) 58dfd8a20af6df25725650d8749573f8b9d0e6e6fabb8e206dd321bf237abf62
+(2) e7d4ab370b9cc291853637b0baa14a2396b84be7a9b3380880e3e43183dacdc6
+(3) a26d53fdfcf9692c7a1d4ba4bf438f85310ff2f7741d4bb4415b7682fa71d043
+(4) c11f57ca43bfbd6235957725bac6011362a786b8314e7850e1194effa42aebf8
+(5) 5df23671c205d043405aef1db127752da44d5ebcae9cce364e5f0679a38fd6a3
+(6) d8bb78188522e6e5c8c1781397a1c85cddfae91127c81500fecc5fec2ad2e19c
+(7) e3dc048a0f576a65a1c49a9199679a0c22e5304b28f7c79f57f34915041b14b5
+(8) 9894d312cfa10976d4562b720717b3a0f6fd5032aa3b3a83ea3ccedfa07af96d
+(9) 44cb56299b43a3e74c1c3e904c659eb880cf649aeea7ef4479e22dbec32c7c12
+
+HD Wallet
+==================
+Mnemonic:      lobster harsh street address begin wool few stamp midnight elephant proud dilemma
+Base HD Path:  m/44'/60'/0'/0/{account_index}
+
+Listening on localhost:8545

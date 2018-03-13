@@ -1,0 +1,33 @@
+{
+  "name": "solidify",
+  "version": "1.0.0",
+  "description": "create your own daos",
+  "main": "truffle.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JatinNanda/DAOism.git"
+  },
+  "keywords": [
+    "ethereum",
+    "solidity",
+    "dao"
+  ],
+  "author": "Solidify",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JatinNanda/DAOism/issues"
+  },
+  "homepage": "https://github.com/JatinNanda/DAOism#readme",
+  "dependencies": {
+    "babel-polyfill": "^6.26.0"
+  },
+  "devDependencies": {
+    "babel-register": "^6.26.0"
+  }
+}
