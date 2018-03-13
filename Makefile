@@ -6,7 +6,9 @@ default: ;
 # add truffle and ganache to $PATH
 export PATH := ./node_modules/.bin:$(PATH)
 
-test: ganache 
+test:
+			truffle compile
+			truffle migrate
 			truffle test
 .PHONY: test
 				#xcodebuild test -project KinSDK/KinSDK.xcodeproj \
