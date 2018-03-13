@@ -15,7 +15,7 @@ before_install:
   - cd .logs
   - npm install
   - cd ../
-  - ganache-cli
+  - make ganache-run
 
 script:
   - make test
