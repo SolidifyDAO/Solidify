@@ -1,5 +1,3 @@
-const testUtil = require('solidity-test-util')
-
 var Proposal = artifacts.require('../contracts/Proposal.sol')
 var choicesList = ['Chocolate', 'Vanilla', 'Strawberry']
 
