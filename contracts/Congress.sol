@@ -134,6 +134,13 @@ contract Congress is owned, tokenRecipient {
         delete members[members.length-1];
         members.length--;
     }
+    /**
+     * Get number of members
+     *
+     */
+    function countMembers() public view returns (uint memberCount) {
+       memberCount = members.length;
+    }
 
     /**
      * Change voting rules
