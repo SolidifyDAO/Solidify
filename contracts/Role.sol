@@ -1,14 +1,13 @@
-pragma solidity ^0.4.16;
+pragma solidity ^0.4.2;
 
 contract Role {
-    address[] roleMembers; // members in the role; 
+    address[] roleMembers; // members in the role;
     string roleName;
 
     function Role(string _roleName) public {
       roleName = _roleName;
     }
 
-    // TODO: maybe incorporate separate class to represent distribution scheme
     function getVotes() public view returns (uint voteCount);
 
     function addMemberToRole(address _targetMember) public {
@@ -16,17 +15,20 @@ contract Role {
       roleMembers.length++;
     }
 
-    function removeMemberFromRole(address _targetMember) public {
-      // TODO
-
+    function removeMemberFromRole(address targetMember) public {
+      for (uint i = 0; i < roleMembers.length - 1; i++) {
+        if (roleMembers[i] == targetMember) {
+            roleMembers[i] = roleMembers[i + 1];
+         }
+         roleMembers.length--;
+      }
     }
 
-    function getRoleName() public returns (string) {
+    function getRoleName() public view returns (string) {
       return roleName;
     }
 
-    function getMembers() public
-      returns (address[]) {
+    function getMembers() public view returns (address[]) {
         return roleMembers;
     }
 }
@@ -35,8 +37,7 @@ contract RoleFlatIndividual is Role {
 
   uint individualTokens;
 
-  function RoleFlatIndividual(string _roleName, uint _individualTokens) public {
-    super.Role(_roleName);
+  function RoleFlatIndividual(uint _individualTokens, string _roleName) Role(_roleName) public {
     individualTokens = _individualTokens;
   }
 
@@ -49,8 +50,7 @@ contract RoleFlatGroup is Role {
 
   uint groupTokens;
 
-  function RoleFlatGroup(string _roleName, uint _groupTokens) public {
-    super.Role(_roleName);
+  function RoleFlatGroup(uint _groupTokens, string _roleName) Role( _roleName) public {
     groupTokens = _groupTokens;
   }
 
@@ -59,12 +59,11 @@ contract RoleFlatGroup is Role {
   }
 }
 
-contract RolePercentageBased is Role() {
+contract RolePercentageBased is Role {
 
   uint percentageOwned; // *Important* This is an integer and must be divided. Not sure how to represent floats atm
 
-  function RolePercentageBased(string _roleName, uint _percentageOwned) public {
-    super.Role(_roleName);
+  function RolePercentageBased(uint _percentageOwned, string _roleName) Role(_roleName) public {
     percentageOwned = _percentageOwned;
   }
 
