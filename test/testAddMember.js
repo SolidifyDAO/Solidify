@@ -1,26 +1,28 @@
-var Congress = artifacts.require('../contracts/Congress.sol')
+var DAO = artifacts.require('../contracts/DAO.sol')
+var Role = artifacts.require('../contracts/Role.sol')
 
-contract('Congress', function(accounts) {
+contract('DAO', function(accounts) {
 
-  let CongressInstance = null
-  beforeEach('setting up proposal with options', async() => {
-    // worth noting that when this is instantiated, two members get added
-    CongressInstance = await Congress.deployed()
+  let DAOInstance = null
+  beforeEach('setting up DAO with founder', async() => {
+    // worth noting that when this is instantiated, a founder member gets added
+    DAOInstance = await DAO.new()
   })
 
   it("Should be able to add, then remove a member",  async() => {
-    // add a member that is not empty/founder
-    await CongressInstance.addMember(accounts[1], 'first normal member')
-    let addedMemberAddress = await CongressInstance.members(2)
-    assert.equal(addedMemberAddress[0], accounts[1])
+    // add a member that is not the founder
+    await DAOInstance.addMember(accounts[1], 'first normal member', 'employee')
+    let addedMember = await DAOInstance.members(accounts[1])
+    // assert name
+    assert.equal(addedMember[2], 'first normal member')
+    // assert role
+    let roleInstance = await Role.at(addedMember[0]) // *This is how you get a contract instance at a specific address!
+    let roleName = await roleInstance.getRoleName()
+    assert.equal(roleName, 'employee')
 
     // remove that member
-    await CongressInstance.removeMember(accounts[1])
-    let count = await CongressInstance.countMembers()
-    assert.equal(count, 2)
-    let removedMemberMembership = await CongressInstance.memberId(accounts[1])
-    // TODO failing this check because nothing actually happens to the membership mapping when someone is removed
-    // assert.equal(removedMemberMembership.toNumber(), 0)
+    await DAOInstance.removeMember(accounts[1])
+    assert.deepEqual({}, DAOInstance.members(accounts[1]))
   })
 })
 
