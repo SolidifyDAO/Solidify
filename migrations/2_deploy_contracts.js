@@ -1,8 +1,8 @@
 var ConvertLib = artifacts.require("./ConvertLib.sol");
-var Congress = artifacts.require("./Congress.sol");
+var DAO = artifacts.require("./DAO.sol");
 
 module.exports = function(deployer) {
   deployer.deploy(ConvertLib);
-  deployer.link(ConvertLib, Congress);
-  deployer.deploy(Congress, 0, 0, 0);
+  deployer.link(ConvertLib, DAO);
+  deployer.deploy(DAO, 0, 0, 0);
 };
