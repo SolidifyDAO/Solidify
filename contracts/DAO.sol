@@ -23,17 +23,18 @@ contract DAO is owned {
     mapping(address => Member) public members;
 
     struct Member {
-        //Role role;
+        Role role;
         address member;
         string name;
     }
 
+    // TODO: Need logic to take input distribution type and create appropriate role subclass to give to all of the Members. This is temporary
     /**
      * Constructor function
      */
     function DAO () public {
         // let's add the founder, to save a step later
-        addMember(owner, 'founder');
+        addMember(owner, 'founder', 'CEO');
     }
 
     /**
@@ -42,9 +43,10 @@ contract DAO is owned {
      * @param targetMember ethereum address to be added
      * @param memberName public name for that member
      */
-    function addMember(address targetMember, string memberName) onlyOwner public {
+    function addMember(address targetMember, string memberName, string roleName) onlyOwner public {
+      RoleFlatGroup a = new RoleFlatGroup(50, roleName);
       // create the new member in our members map
-      members[targetMember] = Member({member: targetMember, name: memberName});
+      members[targetMember] = Member({role: a, member: targetMember, name: memberName});
     }
 
     /**
@@ -53,14 +55,8 @@ contract DAO is owned {
      * @param targetMember ethereum address to be removed
      */
     function removeMember(address targetMember) onlyOwner public {
-        //require(memberId[targetMember] != 0);
-
-        //for (uint i = memberId[targetMember]; i<members.length-1; i++){
-        //    members[i] = members[i+1];
-        //}
-        //delete members[members.length-1];
-        //members.length--;
-
+        // TODO handle not a member
+        delete members[targetMember];
     }
 }
 
