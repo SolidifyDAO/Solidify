@@ -45,6 +45,7 @@ contract DAO is owned {
      */
     function addMember(address targetMember, string memberName, string roleName) onlyOwner public {
       RoleFlatGroup a = new RoleFlatGroup(50, roleName);
+      a.addMemberToRole(targetMember);
       // create the new member in our members map
       members[targetMember] = Member({role: a, member: targetMember, name: memberName});
     }
@@ -54,9 +55,15 @@ contract DAO is owned {
      *
      * @param targetMember ethereum address to be removed
      */
-    function removeMember(address targetMember) onlyOwner public {
+    function removeMember(address targetMember) onlyOwner public returns(Member) {
         // TODO handle not a member
-        delete members[targetMember];
+        // SOLUTION: require that the member is non null (compare it to an index in our mapping where all the values for the struct are unset)
+      Member storage member = members[targetMember];
+      require(member.member != address(0));
+
+      member.role.removeMemberFromRole(targetMember);
+      delete members[targetMember];
+      return member;
     }
 }
 

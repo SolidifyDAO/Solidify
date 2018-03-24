@@ -11,7 +11,7 @@ contract Role {
     function getVotes() public view returns (uint voteCount);
 
     function addMemberToRole(address _targetMember) public {
-      roleMembers[roleMembers.length] = _targetMember;
+      roleMembers.push(_targetMember);
       roleMembers.length++;
     }
 
@@ -30,6 +30,10 @@ contract Role {
 
     function getMembers() public view returns (address[]) {
         return roleMembers;
+    }
+
+    function getMemberCount() public view returns (uint) {
+        return roleMembers.length;
     }
 }
 
@@ -72,5 +76,4 @@ contract RolePercentageBased is Role {
     return uint((percentageOwned / 100) * 500);
   }
 }
-
 

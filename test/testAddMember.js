@@ -23,6 +23,14 @@ contract('DAO', function(accounts) {
     // remove that member
     await DAOInstance.removeMember(accounts[1])
     assert.deepEqual({}, DAOInstance.members(accounts[1]))
+    // Check to ensure addedMember is not in the role's members
+    let memberUnseen = true
+    for (let i = 0; i < roleInstance.getMemberCount(); i++) {
+      if (roleInstance.roleMembers[i] == addedMember) {
+        memberUnseen = false
+      }
+    }
+    assert.equal(memberUnseen, true)
   })
 })
 
