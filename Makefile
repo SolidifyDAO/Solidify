@@ -7,8 +7,9 @@ default: ;
 export PATH := ./node_modules/.bin:$(PATH)
 
 test:
+			rm build/contracts/*
 			truffle compile
-			truffle migrate --reset
+			truffle migrate
 			truffle test
 .PHONY: test
 				#xcodebuild test -project KinSDK/KinSDK.xcodeproj \
