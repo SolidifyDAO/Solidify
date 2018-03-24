@@ -7,10 +7,12 @@ default: ;
 export PATH := ./node_modules/.bin:$(PATH)
 
 test:
-			rm build/contracts/*
 			truffle compile
 			truffle migrate
-			truffle test
+			truffle test test/testAddMember.js
+			rm build/contracts/*
+			truffle migrate
+			truffle test test/testVoteProposal.js
 .PHONY: test
 				#xcodebuild test -project KinSDK/KinSDK.xcodeproj \
 				#-scheme KinTestHost \
