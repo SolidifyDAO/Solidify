@@ -18,7 +18,7 @@ contract('DAO', function(accounts) {
     );
   });
 
-  //it('Should be able to add, then remove a member', async () => {
-  //  // add a member that is not the founder
-  //});
+  it('Should populate role mapping correctly', async () => {
+    //lol not necessary really
+  });
 });
