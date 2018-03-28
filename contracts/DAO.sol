@@ -55,8 +55,11 @@ contract DAO is owned {
         for (uint i = 0; i < _roleNames.length; i++) {
           addRole(_distributionScheme, _roleVotes[i], _roleNames[i]);
         }
+
+        // TODO: Need to decide how owner should be added to the DAO.
+        //addOwner(?);
+
         // create all members
-        addMember(owner, 'founder', 'CEO');
         for (i = 0; i < _memberAddrs.length; i++) {
           addMember(_memberAddrs[i], _memberNames[i], _roleNames[i]);
         }
@@ -66,13 +69,20 @@ contract DAO is owned {
       Role r;
       if (equalsbytes32(_distributionScheme, "FlatIndividual")) {
         r = new RoleFlatIndividual(_roleVotes, _roleName);
-      } else if (equalsbytes32(_distributionScheme, "RoleFlatGroup")) {
+      } else if (equalsbytes32(_distributionScheme, "FlatGroup")) {
         r = new RoleFlatGroup(_roleVotes, _roleName);
-      } else if (equalsbytes32(_distributionScheme, "RolePercentageBased")) {
+      } else if (equalsbytes32(_distributionScheme, "PercentageBased")) {
         r = new RolePercentageBased(_roleVotes, _roleName);
       }
       roleMap[_roleName] = r;
     }
+
+    // TODO: This might be a starting point. I think we want owner info as separate constructor arguments tbh.
+    function addOwner(bytes32 _distributionScheme, uint _roleVotes, bytes32 _ownerName) private {
+      addRole(_distributionScheme, _roleVotes, 'owner');
+      addMember(owner, _ownerName, 'owner');
+    }
+
     /**
      * Add member
      *
@@ -82,8 +92,10 @@ contract DAO is owned {
      */
     function addMember(address _targetMember, bytes32 _memberName, bytes32 _roleName) onlyOwner public {
       Role roleOfMember = roleMap[_roleName];
+      require(roleOfMember != address(0));
 
       roleOfMember.addMemberToRole(_targetMember);
+
       // create the new member in our members map
       members[_targetMember] = Member({role: roleOfMember, member: _targetMember, name: _memberName});
   }
@@ -94,8 +106,6 @@ contract DAO is owned {
     * @param targetMember ethereum address to be removed
     */
   function removeMember(address targetMember) onlyOwner public returns(Member) {
-        // TODO handle not a member
-        // SOLUTION: require that the member is non null (compare it to an index in our mapping where all the values for the struct are unset)
       Member storage member = members[targetMember];
       require(member.member != address(0));
 

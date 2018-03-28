@@ -1,14 +1,16 @@
 pragma solidity ^0.4.2;
 
 contract Role {
-    address[] roleMembers; // members in the role;
-    bytes32 roleName;
+    address[] public roleMembers; // members in the role;
+    bytes32 public roleName;
 
     function Role(bytes32 _roleName) public {
       roleName = _roleName;
     }
 
-    function getVotes() public view returns (uint voteCount);
+    function getVotes() public view returns (uint _voteCount);
+
+    function getDistributionScheme() public view returns (bytes32 _distributionScheme);
 
     function addMemberToRole(address _targetMember) public {
       roleMembers.push(_targetMember);
@@ -48,6 +50,10 @@ contract RoleFlatIndividual is Role {
   function getVotes() public view returns (uint voteCount) {
     return individualTokens;
   }
+
+  function getDistributionScheme() public view returns (bytes32 distributionScheme) {
+    return "FlatIndividual";
+  }
 }
 
 contract RoleFlatGroup is Role {
@@ -60,6 +66,10 @@ contract RoleFlatGroup is Role {
 
   function getVotes() public view returns (uint voteCount) {
     return uint(groupTokens / roleMembers.length);
+  }
+
+  function getDistributionScheme() public view returns (bytes32 distributionScheme) {
+    return "FlatGroup";
   }
 }
 
@@ -74,6 +84,10 @@ contract RolePercentageBased is Role {
   function getVotes() public view returns (uint _voteCount) {
     // TODO '500' should be replaced with the total votes in a DAO currently (found ideally via a getter)
     return uint((percentageOwned / 100) * 500);
+  }
+
+  function getDistributionScheme() public view returns (bytes32 distributionScheme) {
+    return "PercentageBased";
   }
 }
 
