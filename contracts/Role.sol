@@ -2,9 +2,9 @@ pragma solidity ^0.4.2;
 
 contract Role {
     address[] roleMembers; // members in the role;
-    string roleName;
+    bytes32 roleName;
 
-    function Role(string _roleName) public {
+    function Role(bytes32 _roleName) public {
       roleName = _roleName;
     }
 
@@ -24,7 +24,7 @@ contract Role {
       }
     }
 
-    function getRoleName() public view returns (string) {
+    function getRoleName() public view returns (bytes32) {
       return roleName;
     }
 
@@ -41,7 +41,7 @@ contract RoleFlatIndividual is Role {
 
   uint individualTokens;
 
-  function RoleFlatIndividual(uint _individualTokens, string _roleName) Role(_roleName) public {
+  function RoleFlatIndividual(uint _individualTokens, bytes32 _roleName) Role(_roleName) public {
     individualTokens = _individualTokens;
   }
 
@@ -54,7 +54,7 @@ contract RoleFlatGroup is Role {
 
   uint groupTokens;
 
-  function RoleFlatGroup(uint _groupTokens, string _roleName) Role( _roleName) public {
+  function RoleFlatGroup(uint _groupTokens, bytes32 _roleName) Role( _roleName) public {
     groupTokens = _groupTokens;
   }
 
@@ -67,7 +67,7 @@ contract RolePercentageBased is Role {
 
   uint percentageOwned; // *Important* This is an integer and must be divided. Not sure how to represent floats atm
 
-  function RolePercentageBased(uint _percentageOwned, string _roleName) Role(_roleName) public {
+  function RolePercentageBased(uint _percentageOwned, bytes32 _roleName) Role(_roleName) public {
     percentageOwned = _percentageOwned;
   }
 
