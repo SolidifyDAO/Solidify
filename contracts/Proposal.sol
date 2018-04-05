@@ -1,5 +1,10 @@
 pragma solidity ^0.4.16;
 
+//tricky
+contract Runnable {
+  function run public ();
+}
+
 /// @title Voting with delegation.
 contract Proposal {
     // This declares a new complex type which will
@@ -15,6 +20,7 @@ contract Proposal {
     struct Choice {
         bytes32 name;   // short name (up to 32 bytes)
         uint voteCount; // number of accumulated votes
+        Runnable runnable; // address of contract for this choice
         // TODO: Include a callback function/external contract here that executes the proposal
     }
 
@@ -28,9 +34,15 @@ contract Proposal {
     Choice[] public choices;
 
     /// Create a new proposal to choose one of choices.
-    function Proposal(bytes32[] choiceNames) public {
+    function Proposal(bytes32[] choiceNames, address[] choiceContracts) public {
         creator = msg.sender;
         voters[creator].weight = 1;
+        /// Every contract should have a nil choice
+        choices.push(Choice({
+            name: "Nil Choice",
+            voteCount: 0,
+            runnable: Runnable(address(0))
+        }));
 
         // For each of the provided choice names,
         // create a new Choice object and add it
@@ -41,7 +53,8 @@ contract Proposal {
             // appends it to the end of `choices`.
             choices.push(Choice({
                 name: choiceNames[i],
-                voteCount: 0
+                voteCount: 0,
+                runnable: Runnable(choiceContracts[i])
             }));
         }
     }
@@ -112,6 +125,13 @@ contract Proposal {
             returns (bytes32 winnerName_)
     {
         // TODO: Execute the callback/external proposal that won
+        // instantiate contract of winner
         winnerName_ = choices[winningChoice()].name;
+        Runnable winnerRunnable = choices[winningChoice()].runnable;
+        if (address(winnerRunnable) != address(0)) {
+          // probably, send ETH to this contract
+          winnerRunnable.run()
+        }
+
     }
 }

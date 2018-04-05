@@ -1,5 +1,6 @@
 var Proposal = artifacts.require('../contracts/Proposal.sol')
 var choicesList = ['Chocolate', 'Vanilla', 'Strawberry']
+var 
 
 contract('Proposal', function(accounts) {
   let ProposalInstance = null
