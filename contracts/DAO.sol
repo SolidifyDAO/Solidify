@@ -23,6 +23,7 @@ contract DAO is owned {
 
     bytes32 public distributionScheme;
     bytes32 public daoName;
+    Proposal[] public proposals;
 
     mapping(address => Member) public members;
     mapping(bytes32 => Role) public roleMap;
@@ -31,6 +32,12 @@ contract DAO is owned {
         Role role;
         address member;
         bytes32 name;
+    }
+
+    struct Proposal {
+      address addr;
+      bytes32 name;
+      bytes32 desc;
     }
 
     // TODO: Need logic to take input distribution type and create appropriate role subclass to give to all of the Members. This is temporary
@@ -98,14 +105,14 @@ contract DAO is owned {
 
       // create the new member in our members map
       members[_targetMember] = Member({role: roleOfMember, member: _targetMember, name: _memberName});
-  }
+    }
 
   /**
     * Remove member
     *
     * @param targetMember ethereum address to be removed
     */
-  function removeMember(address targetMember) onlyOwner public returns(Member) {
+    function removeMember(address targetMember) onlyOwner public returns(Member) {
       Member storage member = members[targetMember];
       require(member.member != address(0));
 
@@ -116,6 +123,10 @@ contract DAO is owned {
 
     function equalsbytes32 (bytes32 a, bytes32 b) private pure returns (bool){
        return keccak256(a) == keccak256(b);
-   }
+    }
+
+    function addProposal(address _proposalAddress, bytes32 _proposalName, bytes32 _description) onlyMembers public {
+      proposals.push(Proposal({addr: _proposalAddress, name: _proposalName, desc: _description}))
+    }
 }
 
