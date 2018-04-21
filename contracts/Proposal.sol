@@ -2,7 +2,7 @@ pragma solidity ^0.4.16;
 
 //tricky
 contract Runnable {
-  function run public ();
+  function run() public;
 }
 
 /// @title Voting with delegation.
@@ -20,7 +20,7 @@ contract Proposal {
     struct Choice {
         bytes32 name;   // short name (up to 32 bytes)
         uint voteCount; // number of accumulated votes
-        Runnable runnable; // address of contract for this choice
+        address runnable; // address of contract for this choice
         // TODO: Include a callback function/external contract here that executes the proposal
     }
 
@@ -41,20 +41,20 @@ contract Proposal {
         choices.push(Choice({
             name: "Nil Choice",
             voteCount: 0,
-            runnable: Runnable(address(0))
+            runnable: address(0)
         }));
 
         // For each of the provided choice names,
         // create a new Choice object and add it
         // to the end of the array.
         for (uint i = 0; i < choiceNames.length; i++) {
-            // `Choice({...})` creates a temporary
-            // Choice object and `choices.push(...)`
-            // appends it to the end of `choices`.
+             //`Choice({...})` creates a temporary
+             //Choice object and `choices.push(...)`
+             //appends it to the end of `choices`.
             choices.push(Choice({
                 name: choiceNames[i],
                 voteCount: 0,
-                runnable: Runnable(choiceContracts[i])
+                runnable: choiceContracts[i]
             }));
         }
     }
@@ -121,17 +121,17 @@ contract Proposal {
     // Calls winningChoice() function to get the index
     // of the winner contained in the choices array and then
     // returns the name of the winner
-    function findWinner() public view
+    function findWinner() public
             returns (bytes32 winnerName_)
     {
         // TODO: Execute the callback/external proposal that won
         // instantiate contract of winner
         winnerName_ = choices[winningChoice()].name;
-        Runnable winnerRunnable = choices[winningChoice()].runnable;
-        if (address(winnerRunnable) != address(0)) {
+        //Runnable winnerRunnable = choices[winningChoice()].runnable;
+        //if (address(winnerRunnable) != address(0)) {
           // probably, send ETH to this contract
-          winnerRunnable.run()
-        }
+          //winnerRunnable.run//();
+        //}
 
     }
 }

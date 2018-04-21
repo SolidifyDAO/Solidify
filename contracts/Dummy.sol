@@ -1,3 +1,5 @@
+pragma solidity ^0.4.16;
+
 contract owned {
     address public owner;
 
@@ -16,12 +18,8 @@ contract owned {
 }
 
 contract Dummy is owned {
-  uint i = 0;
+  uint public i = 0;
 
-  function getI() external view returns (uint i) {
-    return i;
-  }
-  
   function run() onlyOwner public {
     i++;
   }

@@ -1,17 +1,21 @@
 var Proposal = artifacts.require('../contracts/Proposal.sol')
-var choicesList = ['Chocolate', 'Vanilla', 'Strawberry']
-var 
+var Dummy = artifacts.require('../contracts/Dummy.sol')
+var choicesList = ['Nil Choice', 'Chocolate', 'Vanilla', 'Strawberry']
 
 contract('Proposal', function(accounts) {
   let ProposalInstance = null
   beforeEach('setting up proposal with options', async() => {
-    ProposalInstance = await Proposal.new(choicesList)
+    DummyInstance1 = await Dummy.new()
+    DummyInstance2 = await Dummy.new()
+    DummyInstance3 = await Dummy.new()
+    var dummyList = [DummyInstance1, DummyInstance2, DummyInstance3]
+    ProposalInstance = await Proposal.new(choicesList, dummyList)
   })
 
   it("Should initialize poll with 0 votes correctly",  async() => {
     for (i = 0; i < choicesList.length; i++) {
       let choice = await ProposalInstance.choices(i)
-      assert.equal(choice[1].toNumber(), 0)
+      assert.equal(int(choice[1].toNumber()), 0)
     }
   })
 
@@ -101,6 +105,18 @@ contract('Proposal', function(accounts) {
     }
     let winner = await ProposalInstance.findWinner()
     assert.equal(web3.toAscii(winner).replace(/\u0000/g, ''), choicesList[computeMode(votes)])
+  })
+  it("Should check dummy inc", async() => {
+    // sets up 5 accounts to vote on a random choice.
+    let creator = await ProposalInstance.creator()
+    var tx = {from: creator}
+    var votes = []
+    await assert.equal(web3.toAscii(winner).runnable.i(), 0)
+    await ProposalInstance.vote(1, tx)
+    votes.push(choiceIndex)
+    let winner = await ProposalInstance.findWinner()
+    await assert.equal(web3.toAscii(winner).replace(/\u0000/g, ''), choicesList[computeMode(votes)])
+    await assert.equal(web3.toAscii(winner).runnable.i(), 1)
   })
 })
 
