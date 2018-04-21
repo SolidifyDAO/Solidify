@@ -25,6 +25,7 @@ contract Proposal {
     }
 
     address public creator;
+    uint votingEndTime;
 
     // This declares a state variable that
     // stores a `Voter` struct for each possible address.
@@ -34,9 +35,10 @@ contract Proposal {
     Choice[] public choices;
 
     /// Create a new proposal to choose one of choices.
-    function Proposal(bytes32[] choiceNames, address[] choiceContracts) public {
+    function Proposal(bytes32[] choiceNames, address[] choiceContracts, uint _votingEndTime) public {
         creator = msg.sender;
         voters[creator].weight = 1;
+        votingEndTime = _votingEndTime;
         /// Every contract should have a nil choice
         choices.push(Choice({
             name: "Nil Choice",
@@ -128,6 +130,7 @@ contract Proposal {
     }
 
     function executeWinner() public {
+        require(now > votingEndTime);
         Runnable winnerRunnable = Runnable(choices[winningChoice()].runnable);
         if (address(winnerRunnable) != address(0)) {
           // probably, send ETH to this contract

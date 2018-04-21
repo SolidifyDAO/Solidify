@@ -40,6 +40,12 @@ contract DAO is owned {
       bytes32 desc;
     }
 
+    modifier onlyMembers {
+        address member = members[msg.sender].member;
+        require(member != address(0));
+        _;
+    }
+
     // TODO: Need logic to take input distribution type and create appropriate role subclass to give to all of the Members. This is temporary
     /**
      * Constructor function
@@ -126,7 +132,7 @@ contract DAO is owned {
     }
 
     function addProposal(address _proposalAddress, bytes32 _proposalName, bytes32 _description) onlyMembers public {
-      proposals.push(Proposal({addr: _proposalAddress, name: _proposalName, desc: _description}))
+      proposals.push(Proposal({addr: _proposalAddress, name: _proposalName, desc: _description}));
     }
 }
 
