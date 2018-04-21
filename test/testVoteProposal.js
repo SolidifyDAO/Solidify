@@ -1,6 +1,6 @@
 var Proposal = artifacts.require('../contracts/Proposal.sol')
 var Dummy = artifacts.require('../contracts/Dummy.sol')
-var choicesList = ['Nil Choice', 'Chocolate', 'Vanilla', 'Strawberry']
+var choicesList = ['Chocolate', 'Vanilla', 'Strawberry']
 
 contract('Proposal', function(accounts) {
   let ProposalInstance = null
@@ -8,7 +8,7 @@ contract('Proposal', function(accounts) {
     DummyInstance1 = await Dummy.new()
     DummyInstance2 = await Dummy.new()
     DummyInstance3 = await Dummy.new()
-    var dummyList = [DummyInstance1, DummyInstance2, DummyInstance3]
+    var dummyList = [DummyInstance1.address, DummyInstance2.address, DummyInstance3.address]
     ProposalInstance = await Proposal.new(choicesList, dummyList)
   })
 

@@ -18,7 +18,11 @@ contract owned {
 }
 
 contract Dummy is owned {
-  uint public i = 0;
+  uint public i;
+
+  function Dummy() public {
+    i = 0;
+  }
 
   function run() onlyOwner public {
     i++;
