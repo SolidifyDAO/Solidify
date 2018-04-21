@@ -106,8 +106,7 @@ contract Proposal {
     /// @dev Computes the winning choice taking all
     /// previous votes into account.
     // TODO: Figure out how to resolve ties
-    function winningChoice() public view
-            returns (uint winningChoice_)
+    function winningChoice() public view returns (uint winningChoice_) 
     {
         uint winningVoteCount = 0;
         for (uint c = 0; c < choices.length; c++) {
@@ -118,20 +117,21 @@ contract Proposal {
         }
     }
 
-    // Calls winningChoice() function to get the index
-    // of the winner contained in the choices array and then
-    // returns the name of the winner
-    function findWinner() public
-            returns (bytes32 winnerName_)
+    function findWinner() public view returns (bytes32 winnerName_)
     {
-        // TODO: Execute the callback/external proposal that won
-        // instantiate contract of winner
         winnerName_ = choices[winningChoice()].name;
-        //Runnable winnerRunnable = choices[winningChoice()].runnable;
-        //if (address(winnerRunnable) != address(0)) {
-          // probably, send ETH to this contract
-          //winnerRunnable.run//();
-        //}
+    }
 
+    function findWinnerRunnable() public view returns (address winnerRunnable_) 
+    {
+        winnerRunnable_ = choices[winningChoice()].runnable;
+    }
+
+    function executeWinner() public {
+        Runnable winnerRunnable = Runnable(choices[winningChoice()].runnable);
+        if (address(winnerRunnable) != address(0)) {
+          // probably, send ETH to this contract
+          winnerRunnable.run();
+        }
     }
 }

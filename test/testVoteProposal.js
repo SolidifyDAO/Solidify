@@ -1,7 +1,6 @@
 var Proposal = artifacts.require('../contracts/Proposal.sol')
 var Dummy = artifacts.require('../contracts/Dummy.sol')
-var choicesList = ['Chocolate', 'Vanilla', 'Strawberry']
-var choicesList = []
+var choicesList = ['Nil Choice', 'Chocolate']
 
 contract('Proposal', function(accounts) {
   let ProposalInstance = null
@@ -10,8 +9,9 @@ contract('Proposal', function(accounts) {
     DummyInstance2 = await Dummy.new()
     DummyInstance3 = await Dummy.new()
     var dummyList = [DummyInstance1.address, DummyInstance2.address, DummyInstance3.address]
-    //ProposalInstance = await Proposal.new(choicesList, dummyList)
-    ProposalInstance = await Proposal.new([], [])
+    var dummyList = [DummyInstance1.address]
+    var choicesListwoutNil = ['Chocolate']
+    ProposalInstance = await Proposal.new(choicesListwoutNil, dummyList)
   })
 
   it("Should initialize poll with 0 votes correctly",  async() => {
@@ -107,20 +107,36 @@ contract('Proposal', function(accounts) {
       votes.push(choiceIndex)
     }
     let winner = await ProposalInstance.findWinner.call()
-    computedWinner = choicesList.length == 0 ? "Nil Choice" : choicesList[computeMode(votes)]
+    computedWinner = choicesList[computeMode(votes)]
     assert.equal(web3.toAscii(winner).replace(/\u0000/g, ''), computedWinner)
   })
-  it("Should check dummy inc", async() => {
+  it("Should check that dummy increments1", async() => {
     // sets up 5 accounts to vote on a random choice.
     let creator = await ProposalInstance.creator()
     var tx = {from: creator}
     var votes = []
-    await assert.equal(web3.toAscii(winner).runnable.i(), 0)
-    await ProposalInstance.vote(1, tx)
+    let choiceIndex = 1
+    //await assert.equal(web3.toAscii(winner).runnable.i(), 0)
+    await ProposalInstance.vote(choiceIndex, tx)
+    assert(await DummyInstance1.i(), 0)
+    await DummyInstance1.run()
+    assert(await DummyInstance1.i(), 1)
+  })
+  it("Should check that dummy increments2", async() => {
+    // sets up 5 accounts to vote on a random choice.
+    let creator = await ProposalInstance.creator()
+    var tx = {from: creator}
+    var votes = []
+    let choiceIndex = 1
+    //await assert.equal(web3.toAscii(winner).runnable.i(), 0)
+    await ProposalInstance.vote(choiceIndex, tx)
     votes.push(choiceIndex)
-    let winner = await ProposalInstance.findWinner()
-    await assert.equal(web3.toAscii(winner).replace(/\u0000/g, ''), choicesList[computeMode(votes)])
-    await assert.equal(web3.toAscii(winner).runnable.i(), 1)
+    let winner = await ProposalInstance.findWinner.call()
+    await ProposalInstance.executeWinner()
+    let winnerRunnableAddress = await ProposalInstance.findWinnerRunnable.call()
+    let winnerRunnable = await Dummy.at(winnerRunnableAddress)
+    assert.equal(web3.toAscii(winner).replace(/\u0000/g, ''), choicesList[computeMode(votes)])
+    assert.equal((await winnerRunnable.i()).toNumber(), 1)
   })
 })
 

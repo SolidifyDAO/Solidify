@@ -24,7 +24,7 @@ contract Dummy is owned {
     i = 0;
   }
 
-  function run() onlyOwner public {
+  function run() public {
     i++;
   }
 }
