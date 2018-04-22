@@ -47,8 +47,8 @@ contract DAO is owned {
         _;
     }
 
-    modifier onlyProposals {
-        bool allow = false;
+    modifier onlyProposalsOrDao {
+        bool allow = (msg.sender == owner);
         for(uint i = 0; i < proposals.length; i++) {
           for(uint j = 0; j < proposals[i].choices.length; j++) {
             if (proposals[i].choices[j] == msg.sender) {
@@ -109,7 +109,7 @@ contract DAO is owned {
      * @param _memberName public name for that member
      * @param _roleName public name for the role of this member
      */
-    function addMember(address _targetMember, bytes32 _memberName, bytes32 _roleName) onlyProposals public {
+    function addMember(address _targetMember, bytes32 _memberName, bytes32 _roleName) onlyProposalsOrDao public {
       Role roleOfMember = roleMap[_roleName];
       require(roleOfMember != address(0));
 
@@ -124,7 +124,7 @@ contract DAO is owned {
     *
     * @param targetMember ethereum address to be removed
     */
-    function removeMember(address targetMember) onlyProposals public returns(Member) {
+    function removeMember(address targetMember) onlyProposalsOrDao public returns(Member) {
       Member storage member = members[targetMember];
       require(member.member != address(0));
 
