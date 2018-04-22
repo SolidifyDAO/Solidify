@@ -18,15 +18,15 @@ contract('Proposal', function(accounts) {
       [],
       [],
     )
-    DAOInstance.addMember(accounts[1], 'account1', 'employee')
-    tx = {from: accounts[1]}
-    DummyInstance1 = await Dummy.new()
-    DummyInstance2 = await Dummy.new()
-    AddMemberInstance = await AddMember.new()
-    var dummyList = [DummyInstance1.address, DummyInstance2.address, AddMemberInstance.address]
-    var choicesListwoutNil = ['Chocolate', 'Vanilla', 'Strawberry']
-    ProposalInstance = await Proposal.new(choicesListwoutNil, dummyList, 0, DAOInstance.address)
-    await DAOInstance.addProposal(ProposalInstance.address, 'MyProposal', 'MyProposalDesc', dummyList, tx)
+   DAOInstance.addMember(accounts[1], 'account1', 'employee')
+   tx = {from: accounts[1]}
+   DummyInstance1 = await Dummy.new()
+   DummyInstance2 = await Dummy.new()
+   AddMemberInstance = await AddMember.new()
+   var dummyList = [DummyInstance1.address, DummyInstance2.address, AddMemberInstance.address]
+   var choicesListwoutNil = ['Chocolate', 'Vanilla', 'Strawberry']
+   ProposalInstance = await Proposal.new(choicesListwoutNil, dummyList, 0, DAOInstance.address)
+  await DAOInstance.addProposal(ProposalInstance.address, 'MyProposal', 'MyProposalDesc', dummyList, tx)
   })
 
   it("Should initialize poll with 0 votes correctly",  async() => {
