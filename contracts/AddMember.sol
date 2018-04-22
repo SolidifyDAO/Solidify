@@ -17,10 +17,10 @@ contract owned {
     }
 }
 
-contract Dummy is owned {
+contract AddMember is owned {
   uint public i;
 
-  function Dummy() public {
+  function AddMember() public {
     i = 0;
   }
 

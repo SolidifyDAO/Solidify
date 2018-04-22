@@ -2,7 +2,7 @@ pragma solidity ^0.4.16;
 
 //tricky
 contract Runnable {
-  function run() public;
+  function run(address DAOaddr) public;
 }
 
 /// @title Voting with delegation.
@@ -25,6 +25,7 @@ contract Proposal {
     }
 
     address public creator;
+    address public DAOaddress;
     uint votingEndTime;
 
     // This declares a state variable that
@@ -35,10 +36,11 @@ contract Proposal {
     Choice[] public choices;
 
     /// Create a new proposal to choose one of choices.
-    function Proposal(bytes32[] choiceNames, address[] choiceContracts, uint _votingEndTime) public {
+    function Proposal(bytes32[] choiceNames, address[] choiceContracts, uint _votingEndTime, address _DAOaddress) public {
         creator = msg.sender;
         voters[creator].weight = 1;
         votingEndTime = _votingEndTime;
+        DAOaddress = _DAOaddress;
         /// Every contract should have a nil choice
         choices.push(Choice({
             name: "Nil Choice",
@@ -134,7 +136,7 @@ contract Proposal {
         Runnable winnerRunnable = Runnable(choices[winningChoice()].runnable);
         if (address(winnerRunnable) != address(0)) {
           // probably, send ETH to this contract
-          winnerRunnable.run();
+          winnerRunnable.run(DAOaddress);
         }
     }
 }

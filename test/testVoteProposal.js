@@ -1,17 +1,28 @@
 var Proposal = artifacts.require('../contracts/Proposal.sol')
+var DAO = artifacts.require('../contracts/DAO.sol')
 var Dummy = artifacts.require('../contracts/Dummy.sol')
 var choicesList = ['Nil Choice', 'Chocolate']
 
 contract('Proposal', function(accounts) {
   let ProposalInstance = null
+  let DAOInstance = null
   beforeEach('setting up proposal with options', async() => {
+    DAOInstance = await DAO.new(
+      'TestName',
+      'FlatIndividual',
+      ['employee'],
+      [5],
+      [],
+      [],
+      [],
+    )
     DummyInstance1 = await Dummy.new()
     DummyInstance2 = await Dummy.new()
     DummyInstance3 = await Dummy.new()
     var dummyList = [DummyInstance1.address, DummyInstance2.address, DummyInstance3.address]
     var dummyList = [DummyInstance1.address]
     var choicesListwoutNil = ['Chocolate']
-    ProposalInstance = await Proposal.new(choicesListwoutNil, dummyList)
+    ProposalInstance = await Proposal.new(choicesListwoutNil, dummyList, 0, DAOInstance.address)
   })
 
   it("Should initialize poll with 0 votes correctly",  async() => {
@@ -119,7 +130,7 @@ contract('Proposal', function(accounts) {
     //await assert.equal(web3.toAscii(winner).runnable.i(), 0)
     await ProposalInstance.vote(choiceIndex, tx)
     assert(await DummyInstance1.i(), 0)
-    await DummyInstance1.run()
+    await DummyInstance1.run(await DAOInstance.owner())
     assert(await DummyInstance1.i(), 1)
   })
   it("Should check that dummy increments2", async() => {
