@@ -115,7 +115,7 @@ contract DAO is owned {
      * @param _memberName public name for that member
      * @param _roleName public name for the role of this member
      */
-    function addMember(address _targetMember, bytes32 _memberName, bytes32 _roleName) onlyOwnerOrProposals public {
+    function addMember(address _targetMember, bytes32 _memberName, bytes32 _roleName)  public {
       Role roleOfMember = roleMap[_roleName];
       require(roleOfMember != address(0));
 

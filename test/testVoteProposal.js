@@ -1,7 +1,9 @@
 var Proposal = artifacts.require('../contracts/Proposal.sol')
 var DAO = artifacts.require('../contracts/DAO.sol')
 var Dummy = artifacts.require('../contracts/Dummy.sol')
-var choicesList = ['Nil Choice', 'Chocolate']
+var AddMember = artifacts.require('../contracts/AddMember.sol')
+var Role = artifacts.require('../contracts/Role.sol')
+var choicesList = ['Nil Choice', 'Chocolate', 'Vanilla', 'Strawberry']
 
 contract('Proposal', function(accounts) {
   let ProposalInstance = null
@@ -18,10 +20,9 @@ contract('Proposal', function(accounts) {
     )
     DummyInstance1 = await Dummy.new()
     DummyInstance2 = await Dummy.new()
-    DummyInstance3 = await Dummy.new()
-    var dummyList = [DummyInstance1.address, DummyInstance2.address, DummyInstance3.address]
-    var dummyList = [DummyInstance1.address]
-    var choicesListwoutNil = ['Chocolate']
+    AddMemberInstance = await AddMember.new()
+    var dummyList = [DummyInstance1.address, DummyInstance2.address, AddMemberInstance.address]
+    var choicesListwoutNil = ['Chocolate', 'Vanilla', 'Strawberry']
     ProposalInstance = await Proposal.new(choicesListwoutNil, dummyList, 0, DAOInstance.address)
   })
 
@@ -119,7 +120,7 @@ contract('Proposal', function(accounts) {
     }
     let winner = await ProposalInstance.findWinner.call()
     computedWinner = choicesList[computeMode(votes)]
-    assert.equal(web3.toAscii(winner).replace(/\u0000/g, ''), computedWinner)
+    assert.equal(toString(winner), computedWinner)
   })
   it("Should check that dummy increments1", async() => {
     // sets up 5 accounts to vote on a random choice.
@@ -127,10 +128,9 @@ contract('Proposal', function(accounts) {
     var tx = {from: creator}
     var votes = []
     let choiceIndex = 1
-    //await assert.equal(web3.toAscii(winner).runnable.i(), 0)
     await ProposalInstance.vote(choiceIndex, tx)
     assert(await DummyInstance1.i(), 0)
-    await DummyInstance1.run(await DAOInstance.owner())
+    await DummyInstance1.run(await DAOInstance.address)
     assert(await DummyInstance1.i(), 1)
   })
   it("Should check that dummy increments2", async() => {
@@ -139,15 +139,50 @@ contract('Proposal', function(accounts) {
     var tx = {from: creator}
     var votes = []
     let choiceIndex = 1
-    //await assert.equal(web3.toAscii(winner).runnable.i(), 0)
+    //await assert.equal(toString(winner), 0)
     await ProposalInstance.vote(choiceIndex, tx)
     votes.push(choiceIndex)
     let winner = await ProposalInstance.findWinner.call()
     await ProposalInstance.executeWinner()
     let winnerRunnableAddress = await ProposalInstance.findWinnerRunnable.call()
     let winnerRunnable = await Dummy.at(winnerRunnableAddress)
-    assert.equal(web3.toAscii(winner).replace(/\u0000/g, ''), choicesList[computeMode(votes)])
+    assert.equal(toString(winner), choicesList[computeMode(votes)])
     assert.equal((await winnerRunnable.i()).toNumber(), 1)
+  })
+
+  it("Should check that a member is added from a manual contract execute", async() => {
+    let creator = await ProposalInstance.creator()
+    var tx = {from: creator}
+
+    await AddMemberInstance.run(await DAOInstance.address)
+
+    let memberJoe = await DAOInstance.members('0x123')
+    assert.equal(toString(memberJoe[2]), 'Joe Wang')
+		let roleInstance = await Role.at(memberJoe[0]) // *This is how you get a contract instance at a specific address!
+    let roleName = await roleInstance.getRoleName()
+    assert.equal(toString(roleName), 'employee')
+  })
+  it("Should check that a member is added on proposal resolution", async() => {
+    // sets up 5 accounts to vote on a random choice.
+    let creator = await ProposalInstance.creator()
+    var tx = {from: creator}
+    var votes = []
+    ADD_MEMBER_INDEX = 3
+    await ProposalInstance.giveRightToVote(accounts[1], tx)
+    await ProposalInstance.vote(ADD_MEMBER_INDEX , {from: accounts[1]})
+    votes.push(ADD_MEMBER_INDEX)
+    let winner = await ProposalInstance.findWinner.call()
+    await ProposalInstance.executeWinner()
+    let winnerRunnableAddress = await ProposalInstance.findWinnerRunnable.call()
+    let winnerRunnable = await AddMember.at(winnerRunnableAddress)
+    assert.equal(toString(winner), choicesList[computeMode(votes)])
+
+    // same as in above test
+    let memberJoe = await DAOInstance.members('0x123')
+    assert.equal(toString(memberJoe[2]), 'Joe Wang')
+		let roleInstance = await Role.at(memberJoe[0]) // *This is how you get a contract instance at a specific address!
+    let roleName = await roleInstance.getRoleName()
+    assert.equal(toString(roleName), 'employee')
   })
 })
 
@@ -164,5 +199,9 @@ function computeMode(arr) {
         }
     })
     return +mode
+}
+
+function toString(str) {
+  return web3.toAscii(str).replace(/\u0000/g, '');
 }
 

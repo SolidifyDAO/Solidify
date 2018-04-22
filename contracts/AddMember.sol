@@ -30,6 +30,6 @@ contract AddMember is owned {
 
   function run(address DAOAddress) public {
     DAO dao = DAO(DAOAddress);
-    dao.addMember(address(0x1), 'Joe Wang', 'employee');
+    dao.addMember(0x123, 'Joe Wang', 'employee');
   }
 }
