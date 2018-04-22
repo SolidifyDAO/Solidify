@@ -1,0 +1,833 @@
+<html>
+<head>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
+  <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700|Roboto:100,300,400,500|Open+Sans" rel="stylesheet">
+  <!--<link rel="stylesheet" type="text/css" href="/static/style.css" />-->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: "Lato";
+      color: #444;
+    }
+
+    .cap {
+      text-transform: capitalize;
+    }
+
+    .light {
+      font-weight: 300;
+    }
+
+    hr {
+      margin-left: 0;
+      margin-right: 0;
+      width: 80%;
+      color: gray; border-style: inset; border-width: 1px;
+    }
+
+    .bg {
+      background-image: url("/static/bg.jpg");
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      z-index: -10;
+    }
+
+    .page {
+      display: flex;
+      height: 100%;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .title {
+      font-family: "Roboto";
+      font-size: 80px;
+      color: #eee;
+      font-weight: 500;
+    }
+
+    .tagline {
+      font-family: "Roboto";
+      font-style: italic;
+      font-size: 18px;
+      color: #eee;
+      font-weight: 300;
+    }
+
+    .overlay {
+      z-index: -5;
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      overflow: auto;
+      top: 0px;
+      left: 0px;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .green_btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      border-radius: 5px;
+    }
+
+    .green_btn.big {
+      padding: 15px 32px;
+    }
+
+    .green_btn:hover {
+      background-color: #388e3c;
+    }
+
+    button {
+      font-family: 'Helvetica Neue';
+      letter-spacing: .3px;
+    }
+
+    button:hover {
+      cursor: pointer;
+    }
+
+    #name {
+      font-size: 40px;
+    }
+
+    .typewriter {
+      white-space: nowrap; /* Keeps the content on a single line */
+      margin: 0 auto; /* Gives that scrolling effect as the typing happens */
+      letter-spacing: .1em; /* Adjust as needed */
+      font-size: 40px;
+      overflow: visible;
+      border: 0px solid;
+      width: 600px;
+      color: #333;
+      padding-bottom: 10px;
+      font-weight: 700;
+    }
+
+    *:focus{
+      outline: none;
+    }
+
+    ::placeholder {
+      color: #eee;
+    }
+
+    #name_btn {
+      color: #aaa;
+      font-size: 16px;
+      border: 0px solid #aaa;
+      padding: 8px;
+      border-radius: 10px;
+      display: none;
+    }
+
+    .vcenter {
+      display: flex;
+      align-items: center;
+    }
+
+    .bg_grey {
+      background-color: #f9f9f9;
+    }
+
+    .voting_schemes_container {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .voting_scheme_container {
+      display: flex;
+      padding: 20px;
+      align-items: center;
+      flex-direction: column;
+      font-size: 20px;
+      width: 300px;
+      color: #333;
+    }
+
+    .voting_scheme_container:hover {
+      cursor: pointer;
+      background-color: #eee;
+      border-radius: 10px;
+    }
+
+    .voting_img {
+      width: 80px;
+      height: 80px;
+      opacity: .9;
+    }
+
+    .voting_title {
+      font-size: 40px;
+      padding-bottom: 60px;
+      color: #333;
+      letter-spacing: .05em;
+      justify-self: flex-start;
+      font-weight: 700;
+    }
+
+    .voting_scheme_title {
+      padding-bottom: 30px;
+      font-size: 22px;
+      font-weight: 400;
+    }
+
+    .voting_scheme_text {
+      margin-top: 30px;
+      font-size: 16px;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    #add_roles {
+      justify-content: flex-start;
+    }
+
+    #add_members {
+      justify-content: flex-start;
+    }
+
+    .member_title {
+      font-size: 65px;
+      color: #333;
+      letter-spacing: .05em;
+      font-weight: 700;
+      padding-top: 30px;
+    }
+
+    .confirm_title {
+      font-size: 65px;
+      color: #333;
+      letter-spacing: .05em;
+      font-weight: 700;
+      padding-bottom: 50px;
+    }
+
+    .add_title {
+      font-size: 65px;
+      color: #333;
+      letter-spacing: .05em;
+      font-weight: 700;
+      padding-top: 30px;
+    }
+
+    .add_title_under {
+      font-size: 20px;
+      color: #999;
+      padding-bottom: 100px;
+    }
+
+    .confirm_title_under {
+      font-size: 25px;
+      color: #555;
+      display: block;
+    }
+
+    #list_role_table_container {
+      width: 70%;
+    }
+
+    .list_role_header {
+      width: 100%;
+      padding-left: 25px;
+      padding-right: 25px;
+    }
+
+    .list_role_header_name {
+      margin: 20px 0px;
+      font-weight: bold;
+      width: 30%;
+      display: inline-block;
+    }
+
+    .list_role_header_votes {
+      margin: 20px 0px;
+      font-weight: bold;
+      width: 30%;
+      display: inline-block;
+    }
+
+    .list_role_header_desc {
+      margin: 20px 0px;
+      font-weight: bold;
+      width: 39%;
+      display: inline-block;
+    }
+
+    .remove-item {
+      display: inline-block;
+      width: 3%;
+      color: #ef5350
+    }
+    .remove-item:hover {
+      cursor: pointer;
+      color: #f44336
+    }
+
+    #list_role_container {
+      width: 100%;
+      background-color: #eee;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      padding: 25px;
+    }
+
+    .list_role_placeholder {
+      color: #999;
+      font-size: 16px;
+    }
+
+    .list_role_item {
+      margin-bottom: 10px;
+    }
+
+    .list_role_item:last-of-type {
+      margin-bottom: 0px;
+    }
+    
+    .list_role_item_name {
+      display: inline-block;
+      margin: 10px 0px;
+      width: 30%;
+    }
+
+    .list_role_item_votes {
+      display: inline-block;
+      margin: 10px 0px;
+      width: 30%;
+    }
+
+    .list_role_item_desc {
+      display: inline-block;
+      margin: 10px 0px;
+      width: 35%;
+    }
+
+    #back_btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 30px;
+      color: #666;
+      display: none;
+    }
+
+    #back_btn:hover {
+      cursor: pointer;
+    }
+    
+    #add_role_next {
+      position: fixed;
+      bottom: 50px;
+      right: 50px;
+      font-size: 60px;
+      color: #81c784;
+      display: none;
+    }
+    #add_role_next:hover {
+      cursor: pointer;
+      color: #388e3c;
+    }
+
+    #add_member_next {
+      position: fixed;
+      bottom: 50px;
+      right: 50px;
+      font-size: 60px;
+      color: #81c784;
+      display: none;
+    }
+    #add_member_next:hover {
+      cursor: pointer;
+      color: #388e3c;
+    }
+
+    #list_member_table_container {
+      width: 70%;
+    }
+
+    .list_member_header {
+      width: 100%;
+      padding-left: 25px;
+      padding-right: 25px;
+    }
+
+    .list_member_header_name {
+      margin: 20px 0px;
+      font-weight: bold;
+      width: 33%;
+      display: inline-block;
+    }
+
+    .list_member_header_address {
+      margin: 20px 0px;
+      font-weight: bold;
+      width: 33%;
+      display: inline-block;
+    }
+
+    .list_member_header_role {
+      margin: 20px 0px;
+      font-weight: bold;
+      width: 33%;
+      display: inline-block;
+    }
+
+    #list_member_container {
+      width: 100%;
+      background-color: #eee;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      padding: 25px;
+    }
+
+    .list_member_placeholder {
+      color: #999;
+      font-size: 16px;
+    }
+
+    .list_member_item {
+      margin-bottom: 10px;
+    }
+
+    .list_member_item:last-of-type {
+      margin-bottom: 0px;
+    }
+    
+    .list_member_item_name {
+      display: inline-block;
+      margin: 10px 0px;
+      width: 33%;
+    }
+
+    .list_member_item_address {
+      display: inline-block;
+      margin: 10px 0px;
+      width: 33%;
+    }
+
+    .list_member_item_role {
+      display: inline-block;
+      margin: 10px 0px;
+      width: 27%;
+    }
+
+    #confirm_btn {
+      margin-top: 60px;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+  </style>
+</head>
+<body scroll="no">
+  <div class="bg"></div>
+  <div class="overlay"></div>
+  <span id="back_btn"><i class="fas fa-arrow-left"></i></span>
+  <div class="page">
+    <div class="title">Solidify</div>
+    </br>
+    <div class="tagline">Using blockchain to manage your organizations and shit</div>
+    </br>
+    <button id="start_btn" class="green_btn big">Get Started</button>
+  </div>
+  <div class="page" id="name">
+    <form id="name_form" class="vcenter" onsubmit="return false">
+      <input name="name" type="text" class="typewriter" placeholder="Enter your company name">
+      <button id="name_btn" type="submit"><i class="fas fa-sign-in-alt"></i> ENTER</button>
+    </form>
+  </div>
+  <div class="page" id="voting">
+    <span class="voting_title">How should votes work?</span>
+    <div class="voting_schemes_container">
+      <div class="voting_scheme_container" onClick="addDaoDataAndMoveTo('voting', 'flat-individual', '#add_roles')">
+        <span class="voting_scheme_title">Flat Individual</span>
+        <img src="/static/role.png" class="voting_img">
+        <span class="voting_scheme_text">
+          Your organization will be broken down into several roles. Members get voting power based on the role they belong to. 
+        </span>
+      </div>
+      <div class="voting_scheme_container" onClick="addDaoDataAndMoveTo('voting', 'flat-role', '#add_roles')">
+        <span class="voting_scheme_title">Flat Role</span>
+        <img src="/static/group.png" class="voting_img">
+        <span class="voting_scheme_text">
+          Your organization will consists of roles, each with a defined amount of total voting power. Adding more members to a role decreases the voting power of members within that role.
+        </span>
+      </div>
+      <div class="voting_scheme_container" onClick="addDaoDataAndMoveTo('voting', 'base-percent', '#add_roles')">
+        <span class="voting_scheme_title">Percentage-Based</span>
+        <img src="/static/percent.png" class="voting_img">
+        <span class="voting_scheme_text">
+          Your organization will be powered by investors. Each investor's voting power is proportional to the amount they invested.
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="page" id="add_roles">
+    <span class="add_title"></span>
+    <span class="add_title_under">
+      For Voting Scheme: <span class="voting_scheme_fill"></span>
+    </span>
+    <div id="list_role_table_container">
+      <div class="list_role_header">
+        <div class="list_role_header_name">Name</div>
+        <div class="list_role_header_votes">Voting Power</div>
+        <div class="list_role_header_desc">Description</div>
+      </div>
+      <div id="list_role_container">
+        <div class="list_role_placeholder">
+          No <span class="fill_roles"></span> currently. Click Add New to add <span class="fill_roles"></span>.
+        </div>
+      </div>
+    </div>
+    <div id="add_role_next"><i class="far fa-check-circle"></i></div>
+    <button class="green_btn big" data-toggle="modal" data-target="#add_role_modal">Add New</button>
+    <div class="modal" id="add_role_modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add New <span class="fill_role cap"></span></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="add_role_form" onsubmit="return false">
+              <div class="form-group">
+                <label for="role-name" class="col-form-label">Role Name</label>
+                <input type="text" class="form-control" id="role-name">
+              </div>
+              <div class="form-group">
+                <label for="role-votes" class="col-form-label">Role Votes</label>
+                <span id="question_tooltip" title="" data-toggle="tooltip"><i class="fas fa-question-circle" style="color: #555"></i></span>
+                <input type="number" class="form-control" id="role-votes">
+              </div>
+              <div class="form-group">
+                <label for="role-desc" class="col-form-label">Role Description</label>
+                <textarea class="form-control" id="role-desc"></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" form="add_role_form" class="btn green_btn">Add New <span class="fill_role cap"></span></button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page" id="add_members">
+    <span class="member_title">Add Members</span>
+    <div id="list_member_table_container">
+      <div class="list_member_header">
+        <div class="list_member_header_name">Name</div>
+        <div class="list_member_header_address">Address</div>
+        <div class="list_member_header_role">Role</div>
+      </div>
+      <div id="list_member_container">
+        <div class="list_member_placeholder">
+          No members currently. Click Add New to add members.
+        </div>
+      </div>
+    </div>
+    <div id="add_member_next"><i class="far fa-check-circle"></i></div>
+    <button class="green_btn big" data-toggle="modal" data-target="#add_member_modal">Add New</button>
+    <div class="modal" id="add_member_modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add New Member</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="add_member_form" onsubmit="return false">
+              <div class="form-group">
+                <label for="member-name" class="col-form-label">Member Name</label>
+                <input type="text" class="form-control" id="member-name">
+              </div>
+              <div class="form-group">
+                <label for="member-address" class="col-form-label">Member Address</label>
+                <input type="text" class="form-control" id="member-address">
+              </div>
+              <div class="form-group">
+                <label for="member-role" class="col-form-label">Member Role</label>
+                <select class="form-control" id="member-role">
+                </select>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" form="add_member_form" class="btn green_btn">Add</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page" id="confirm_page">
+      <span class="confirm_title">Confirm DAO</span>
+      <div style="width:40%">
+        <span class="confirm_title_under">
+          <span class="bold">Name: </span><span class="light name_fill"></span>
+        </span>
+        <span class="confirm_title_under">
+          <span class="bold">Voting Scheme: </span><span class="light voting_scheme_fill"></span>
+        </span>
+        <a href="#" class="confirm_title_under light" id="editRoles">
+          <i class="far fa-edit"></i> Edit Roles (<span class="roles_num_fill"></span>)
+        </a>
+        <a href="#" class="confirm_title_under light" id="editMembers">
+          <i class="far fa-edit"></i> Edit Members (<span class="members_num_fill"></span>)
+        </a>
+      </div>
+      <button id="confirm_btn" class="green_btn big">Confirm</button>
+    </div>
+  </div>
+  <script>
+    var daoData = {
+      roles: [],
+      members: [],
+    }
+
+    var page = 0
+
+    // Start page at top
+    window.onbeforeunload = function() {
+      window.scrollTo(0, 0)
+    }
+
+    $(document).ready(function() {
+      //$("body").css("overflow", "hidden");
+
+      firstNext("#start_btn", "#name", "click", ".typewriter")
+      next("#name_form", "submit")
+      next("#add_role_next", "click")
+      next("#add_member_next", "click")
+      $("#back_btn").click(() => {
+        lastPage()
+      })
+      $(".typewriter").keypress(() => {
+        $("#name_btn").css("display", "block")
+      })
+      $("#name_form").submit(function() {
+        const name = $('input[name="name"]').val()
+        addDaoData('name', name)
+        $(".name_fill").text(name)
+        $('input[name="name"]').blur()
+      })
+      $("#add_role_form").submit(function() {
+        $('#add_role_next').show()
+        const roleName = $('#role-name').val()
+        const roleVotes = $('#role-votes').val()
+        const roleDesc = $('#role-desc').val()
+        if (daoData.roles.length === 0) {
+          $("#list_role_container").html(`<div class="list_role_item">
+            <div class="list_role_item_name">${roleName}</div>
+            <div class="list_role_item_votes">${roleVotes}</div>
+            <div class="list_role_item_desc">${roleDesc}</div>
+            <div onClick="remove(${daoData.roles.length}, 'role')" class="remove-item"><i class="fas fa-minus-circle"></i></div>
+          </div>`)
+        } else {
+          $("#list_role_container").append(`<div class="list_role_item">
+            <div class="list_role_item_name">${roleName}</div>
+            <div class="list_role_item_votes">${roleVotes}</div>
+            <div class="list_role_item_desc">${roleDesc}</div>
+            <div onClick="remove(${daoData.roles.length}, 'role')" class="remove-item"><i class="fas fa-minus-circle"></i></div>
+          </div>`)
+        }
+        $("#member-role").append($('<option>', {
+          value: roleName,
+          text: roleName,
+        }));
+        daoData.roles.push({
+          name: roleName,
+          votes: roleVotes,
+          description: roleDesc,
+        })
+        $('#add_role_modal').modal('hide')
+        $(this).trigger("reset")
+      })
+      $("#add_member_form").submit(function() {
+        $('#add_member_next').show()
+        const name = $('#member-name').val()
+        const address = $('#member-address').val()
+        const role = $('#member-role').val()
+        if (daoData.members.length === 0) {
+          $("#list_member_container").html(`<div class="list_member_item">
+            <div class="list_member_item_name">${name}</div>
+            <div class="list_member_item_address">${address}</div>
+            <div class="list_member_item_role">${role}</div>
+            <div onClick="remove(${daoData.members.length}, 'member')" class="remove-item"><i class="fas fa-minus-circle"></i></div>
+          </div>`)
+        } else {
+          $("#list_member_container").append(`<div class="list_member_item">
+            <div class="list_member_item_name">${name}</div>
+            <div class="list_member_item_address">${address}</div>
+            <div class="list_member_item_role">${role}</div>
+            <div onClick="remove(${daoData.members.length}, 'member')" class="remove-item"><i class="fas fa-minus-circle"></i></div>
+          </div>`)
+        }
+        daoData.members.push({
+          name,
+          address,
+          role,
+        })
+        $('#add_member_modal').modal('hide')
+        $(this).trigger("reset")
+      })
+
+      $("#editMembers").click(() => changePage(4))
+      $("#editRoles").click(() => changePage(3))
+      $("#confirm_btn").click(() => {
+        $.ajax({
+          url: '/createDAO',
+          type: 'post',
+          contentType: 'application/json; charset=utf-8',
+          data: JSON.stringify(daoData),
+          success: function(data) {
+            console.log("SUCCESSFUL REQUEST")
+          }
+        })
+      })
+    })
+
+    function addDaoData(key, value) {
+      daoData[key] = value
+      if (key === 'voting') {
+        if (value === 'base-percent') {
+          $('.add_title').text('Add Your Investors')
+          $('.voting_scheme_fill').text('Percentage-Based')
+          $('.fill_roles').text('investors')
+          $('.fill_role').text('investor')
+          $('#question_tooltip').tooltip({ title: 'Value to specifiy how much voting power each investor gets' })
+        } else {
+            $('.add_title').text('Create Your Roles')
+            $('.fill_roles').text('roles')
+            $('.fill_role').text('role')
+          if (value === 'flat-role') {
+            $('.voting_scheme_fill').text('Flat Role')
+            $('#question_tooltip').tooltip({ title: 'Value to specifiy the total voting power of each role' })
+          } else {
+            $('.voting_scheme_fill').text('Flat Individual')
+            $('#question_tooltip').tooltip({ title: 'Value to specifiy the voting power of each individual member in a role'})
+          }
+        }
+      }
+      console.log(daoData)
+    }
+
+    function remove(index, type) {
+      if (type === 'member') {
+        daoData.members.splice(index, 1)
+        $(".list_member_item:eq("+index+")").remove()
+        console.log(daoData.members)
+        if (daoData.members.length === 0) {
+          $('#add_member_next').hide()
+        }
+      } else {
+        daoData.roles.splice(index, 1)
+        $(".list_role_item:eq("+index+")").remove()
+        $("#member-role option").eq(index).remove()
+        if (daoData.roles.length === 0) {
+          $('#add_role_next').hide()
+        }
+      }
+    }
+
+    function addDaoDataAndMoveTo(key, value, target) {
+      addDaoData(key, value)
+      nextPage()
+    }
+
+    function firstNext(source, target, event, focusInput) {
+      $(source).on(event, function() {
+        $("body").css("overflow", "scroll");
+        $.scrollTo($(target), 300)
+        if (focusInput) $(focusInput).focus()
+        $("body").css("overflow", "hidden");
+        $("#back_btn").css('display', 'block')
+        page++
+      })
+    }
+
+    function next(source, event, focusInput) {
+      $(source).on(event, function() {
+        $("body").css("overflow", "scroll");
+        if (focusInput) $(focusInput).focus()
+        nextPage()
+        $("body").css("overflow", "hidden");
+      })
+    }
+
+    function scrollToPage() {
+      console.log(page)
+      $.scrollTo($(".page").eq(page), 300)
+      if (page === 0) {
+        $("#back_btn").css('display', 'none')
+      }
+    }
+
+    function changePage(pageVal) {
+      page = pageVal
+      // role creation page
+      if (page === 3) {
+        if (daoData.roles.length > 0) {
+          $('#add_role_next').show()
+        } else {
+          $('#add_role_next').hide()
+        }
+      } else if (page === 4) {
+        $('#add_role_next').hide()
+        if (daoData.members.length > 0) {
+          $('#add_member_next').show()
+        } else {
+          $('#add_member_next').hide()
+        }
+      } else {
+          $('#add_member_next').hide()
+          $('#add_role_next').hide()
+        if (page == 5) {
+          $('.roles_num_fill').text(daoData.roles.length)
+          $('.members_num_fill').text(daoData.members.length)
+        }
+      }
+      scrollToPage()
+    }
+
+    function nextPage() {
+      changePage(page + 1)
+    }
+
+    function lastPage() {
+      changePage(page - 1)
+    }
+  </script>
+</body>
+</html>
