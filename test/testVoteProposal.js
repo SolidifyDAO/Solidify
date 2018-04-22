@@ -14,12 +14,17 @@ contract('Proposal', function(accounts) {
       'TestName',
       'FlatIndividual',
       ['employee'],
-      [5],
+      [1],
       [],
       [],
       [],
     )
-   DAOInstance.addMember(accounts[1], 'account1', 'employee')
+   for (i = 0; i < 5; i++) {
+    await DAOInstance.addMember(accounts[i + 1],
+                                'account' + (i + 1),
+                                'employee')
+   }
+
    tx = {from: accounts[1]}
    DummyInstance1 = await Dummy.new()
    AddMemberInstance1 = await AddMember.new(0x123, 'Joe Wang', 'employee')
@@ -41,19 +46,18 @@ contract('Proposal', function(accounts) {
   it("Should allow only whitelisted addresses to vote", async() => {
     let creator = await ProposalInstance.creator()
     var tx = {from: creator}
-    await ProposalInstance.giveRightToVote(accounts[1], tx)
 
     // send from an address that should be able to vote
     tx = {from: accounts[1]}
     await ProposalInstance.vote(0, tx)
     let voterWhoVoted = await ProposalInstance.voters(accounts[1])
-    assert.equal(voterWhoVoted[1], true)
+    assert.equal(voterWhoVoted[0], true)
 
     // an address that shouldn't be able to vote
-    tx = {from: accounts[2]}
-    await ProposalInstance.vote(0, tx)
-    let voterWhoCantVote = await ProposalInstance.voters(accounts[2])
-    assert.equal(voterWhoVoted[2], false)
+    //tx = {from: accounts[2]}
+    //await ProposalInstance.vote(0, tx)
+    //let voterWhoCantVote = await ProposalInstance.voters(accounts[2])
+    //assert.equal(voterWhoVoted[0], false)
   })
 
   it("Should not allow voting twice", async() => {
@@ -62,12 +66,11 @@ contract('Proposal', function(accounts) {
     assert.equal(choiceNoVotes[1], 0)
 
     // Creator votes for choice 0.
-    let creator = await ProposalInstance.creator()
-    var tx = {from: creator}
+    var tx = {from: accounts[1]}
     await ProposalInstance.vote(0, tx)
 
     let choiceVoteOnce = await ProposalInstance.choices(0)
-    assert.equal(choiceVoteOnce[1], 1)
+    assert.equal(choiceVoteOnce[1].toNumber(), 1)
 
     // Creator tries to vote for choice 0 again. Should revert.
     try {
@@ -77,26 +80,9 @@ contract('Proposal', function(accounts) {
     }
   })
 
-  it("Should vote based on weight", async() => {
-    // creator votes for option 1
-    let creator = await ProposalInstance.creator()
-    var tx = {from: creator}
-    await ProposalInstance.vote(0, tx)
-    let choiceVoteOnce = await ProposalInstance.choices(0)
-    assert.equal(choiceVoteOnce[1], 1)
-
-    // another account is given a weight of 5 and votes for option 2
-    await ProposalInstance.giveRightToVote(accounts[1], tx)
-    await ProposalInstance.setWeight(accounts[1], 5, tx)
-    tx = {from: accounts[1]}
-    await ProposalInstance.vote(1, tx)
-    let choiceVoteWeigted5 = await ProposalInstance.choices(1)
-    assert.equal(choiceVoteWeigted5[1], 5)
-  })
-
   it("Should only be able to vote for valid options", async() => {
     let creator = await ProposalInstance.creator()
-    var tx = {from: creator}
+    var tx = {from: accounts[1]}
     // voting for an index == num of options
     try {
       await ProposalInstance.vote(choicesList.length + 1, tx)
@@ -114,11 +100,9 @@ contract('Proposal', function(accounts) {
 
   it("Should calculate the results correctly", async() => {
     // sets up 5 accounts to vote on a random choice.
-    let creator = await ProposalInstance.creator()
-    var tx = {from: creator}
+    var tx = {from: accounts[1]}
     var votes = []
     for (i = 0; i < 5; i++) {
-      await ProposalInstance.giveRightToVote(accounts[i + 1], tx)
       var choiceIndex = Math.floor(Math.random() * choicesList.length)
       await ProposalInstance.vote(choiceIndex , {from: accounts[i + 1]})
       votes.push(choiceIndex)
@@ -136,7 +120,7 @@ contract('Proposal', function(accounts) {
   it("Should check that dummy increments2", async() => {
     // sets up 5 accounts to vote on a random choice.
     let creator = await ProposalInstance.creator()
-    var tx = {from: creator}
+    var tx = {from: accounts[1]}
     var votes = []
     let choiceIndex = 1
     await ProposalInstance.vote(choiceIndex, tx)
@@ -167,7 +151,6 @@ contract('Proposal', function(accounts) {
     var tx = {from: creator}
     var votes = []
     ADD_MEMBER_INDEX = 2
-    await ProposalInstance.giveRightToVote(accounts[1], tx)
     await ProposalInstance.vote(ADD_MEMBER_INDEX , {from: accounts[1]})
     votes.push(ADD_MEMBER_INDEX)
     let winner = await ProposalInstance.findWinner.call()
@@ -203,7 +186,6 @@ contract('Proposal', function(accounts) {
     var tx = {from: creator}
     var votes = []
     ADD_MEMBER_INDEX = 2
-    await ProposalInstance.giveRightToVote(accounts[1], tx)
     await ProposalInstance.vote(ADD_MEMBER_INDEX , {from: accounts[1]})
     votes.push(ADD_MEMBER_INDEX)
     let winner = await ProposalInstance.findWinner.call()
