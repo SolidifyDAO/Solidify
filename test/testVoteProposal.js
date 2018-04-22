@@ -80,12 +80,12 @@ contract('Proposal', function(accounts) {
     assert.equal(choiceVoteOnce[1], 1)
 
     // another account is given a weight of 5 and votes for option 2
-    //await ProposalInstance.giveRightToVote(accounts[1], tx)
-    //await ProposalInstance.setWeight(accounts[1], 5, tx)
-    //tx = {from: accounts[1]}
-    //await ProposalInstance.vote(1, tx)
-    //let choiceVoteWeigted5 = await ProposalInstance.choices(1)
-    //assert.equal(choiceVoteWeigted5[1], 5)
+    await ProposalInstance.giveRightToVote(accounts[1], tx)
+    await ProposalInstance.setWeight(accounts[1], 5, tx)
+    tx = {from: accounts[1]}
+    await ProposalInstance.vote(1, tx)
+    let choiceVoteWeigted5 = await ProposalInstance.choices(1)
+    assert.equal(choiceVoteWeigted5[1], 5)
   })
 
   it("Should only be able to vote for valid options", async() => {

@@ -35,7 +35,7 @@ contract DAO is owned {
     }
 
     struct Proposal {
-      address addr;
+      address proposal;
       bytes32 name;
       bytes32 desc;
     }
@@ -43,6 +43,18 @@ contract DAO is owned {
     modifier onlyMembers {
         address member = members[msg.sender].member;
         require(member != address(0));
+        _;
+    }
+
+    modifier onlyOwnerOrProposals {
+        bool allow = owner == msg.sender;
+        for(uint i = 0; i < proposals.length; i++) {
+          if (proposals[i].proposal == msg.sender) {
+            allow = true;
+            break;
+          }
+        }
+        require(allow);
         _;
     }
 
@@ -103,7 +115,7 @@ contract DAO is owned {
      * @param _memberName public name for that member
      * @param _roleName public name for the role of this member
      */
-    function addMember(address _targetMember, bytes32 _memberName, bytes32 _roleName) onlyOwner public {
+    function addMember(address _targetMember, bytes32 _memberName, bytes32 _roleName) onlyOwnerOrProposals public {
       Role roleOfMember = roleMap[_roleName];
       require(roleOfMember != address(0));
 
@@ -118,7 +130,7 @@ contract DAO is owned {
     *
     * @param targetMember ethereum address to be removed
     */
-    function removeMember(address targetMember) onlyOwner public returns(Member) {
+    function removeMember(address targetMember) onlyOwnerOrProposals public returns(Member) {
       Member storage member = members[targetMember];
       require(member.member != address(0));
 
@@ -132,7 +144,7 @@ contract DAO is owned {
     }
 
     function addProposal(address _proposalAddress, bytes32 _proposalName, bytes32 _description) onlyMembers public {
-      proposals.push(Proposal({addr: _proposalAddress, name: _proposalName, desc: _description}));
+      proposals.push(Proposal({proposal: _proposalAddress, name: _proposalName, desc: _description}));
     }
 }
 
