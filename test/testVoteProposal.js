@@ -2,8 +2,9 @@ var Proposal = artifacts.require('../contracts/Proposal.sol')
 var DAO = artifacts.require('../contracts/DAO.sol')
 var Dummy = artifacts.require('../contracts/Dummy.sol')
 var AddMember = artifacts.require('../contracts/AddMember.sol')
+var AddRole = artifacts.require('../contracts/AddRole.sol')
 var Role = artifacts.require('../contracts/Role.sol')
-var choicesList = ['Nil Choice', 'Chocolate', 'Vanilla', 'Strawberry']
+var choicesList = ['Nil Choice', 'Chocolate', 'Vanilla', 'Strawberry', 'Pistachio']
 
 contract('Proposal', function(accounts) {
   let ProposalInstance = null
@@ -23,8 +24,9 @@ contract('Proposal', function(accounts) {
    DummyInstance1 = await Dummy.new()
    AddMemberInstance1 = await AddMember.new(0x123, 'Joe Wang', 'employee')
    AddMemberInstance2 = await AddMember.new(0x124, 'Hoe Wang', 'employee')
-   var dummyList = [DummyInstance1.address, AddMemberInstance1.address, AddMemberInstance2.address]
-   var choicesListwoutNil = ['Chocolate', 'Vanilla', 'Strawberry']
+   AddRoleInstance = await AddRole.new(10000, 'CEO')
+   var dummyList = [DummyInstance1.address, AddMemberInstance1.address, AddMemberInstance2.address, AddRoleInstance.address]
+   var choicesListwoutNil = ['Chocolate', 'Vanilla', 'Strawberry', 'Pistachio']
    ProposalInstance = await Proposal.new(choicesListwoutNil, dummyList, 0, DAOInstance.address)
   await DAOInstance.addProposal(ProposalInstance.address, 'MyProposal', 'MyProposalDesc', dummyList, tx)
   })
@@ -158,6 +160,42 @@ contract('Proposal', function(accounts) {
 		let roleInstance = await Role.at(memberJoe[0]) // *This is how you get a contract instance at a specific address!
     let roleName = await roleInstance.getRoleName()
     assert.equal(toString(roleName), 'employee')
+  })
+  it("Should check that a member is added on proposal resolution", async() => {
+    // sets up 5 accounts to vote on a random choice.
+    let creator = await ProposalInstance.creator()
+    var tx = {from: creator}
+    var votes = []
+    ADD_MEMBER_INDEX = 2
+    await ProposalInstance.giveRightToVote(accounts[1], tx)
+    await ProposalInstance.vote(ADD_MEMBER_INDEX , {from: accounts[1]})
+    votes.push(ADD_MEMBER_INDEX)
+    let winner = await ProposalInstance.findWinner.call()
+    await ProposalInstance.executeWinner()
+    let winnerRunnableAddress = await ProposalInstance.findWinnerRunnable.call()
+    let winnerRunnable = await AddMember.at(winnerRunnableAddress)
+    assert.equal(toString(winner), choicesList[computeMode(votes)])
+
+    // same as in above test
+    let memberJoe = await DAOInstance.members('0x123')
+    assert.equal(toString(memberJoe[2]), 'Joe Wang')
+		let roleInstance = await Role.at(memberJoe[0]) // *This is how you get a contract instance at a specific address!
+    let roleName = await roleInstance.getRoleName()
+    assert.equal(toString(roleName), 'employee')
+  })
+
+  it("Should check that a role is added on proposal resolution", async() => {
+    let creator = await ProposalInstance.creator()
+    var tx = {from: creator}
+
+    await AddRoleInstance.run(await DAOInstance.address)
+
+    let roleCEO = await DAOInstance.roleMap('CEO')
+		let roleInstance = await Role.at(roleCEO) // *This is how you get a contract instance at a specific address!
+    let roleName = await roleInstance.getRoleName()
+    assert.equal(toString(roleName), 'CEO')
+    let roleVotes = await roleInstance.getVotes()
+    assert.equal(roleVotes.toNumber(), 10000)
   })
   it("Should check that a member is added on proposal resolution", async() => {
     // sets up 5 accounts to vote on a random choice.
