@@ -21,9 +21,9 @@ contract('Proposal', function(accounts) {
    DAOInstance.addMember(accounts[1], 'account1', 'employee')
    tx = {from: accounts[1]}
    DummyInstance1 = await Dummy.new()
-   DummyInstance2 = await Dummy.new()
-   AddMemberInstance = await AddMember.new()
-   var dummyList = [DummyInstance1.address, DummyInstance2.address, AddMemberInstance.address]
+   AddMemberInstance1 = await AddMember.new(0x123, 'Joe Wang', 'employee')
+   AddMemberInstance2 = await AddMember.new(0x124, 'Hoe Wang', 'employee')
+   var dummyList = [DummyInstance1.address, AddMemberInstance1.address, AddMemberInstance2.address]
    var choicesListwoutNil = ['Chocolate', 'Vanilla', 'Strawberry']
    ProposalInstance = await Proposal.new(choicesListwoutNil, dummyList, 0, DAOInstance.address)
   await DAOInstance.addProposal(ProposalInstance.address, 'MyProposal', 'MyProposalDesc', dummyList, tx)
@@ -127,11 +127,6 @@ contract('Proposal', function(accounts) {
   })
   it("Should check that dummy increments1", async() => {
     // sets up 5 accounts to vote on a random choice.
-    let creator = await ProposalInstance.creator()
-    var tx = {from: creator}
-    var votes = []
-    let choiceIndex = 1
-    await ProposalInstance.vote(choiceIndex, tx)
     assert(await DummyInstance1.i(), 0)
     await DummyInstance1.run(await DAOInstance.address)
     assert(await DummyInstance1.i(), 1)
@@ -142,7 +137,6 @@ contract('Proposal', function(accounts) {
     var tx = {from: creator}
     var votes = []
     let choiceIndex = 1
-    //await assert.equal(toString(winner), 0)
     await ProposalInstance.vote(choiceIndex, tx)
     votes.push(choiceIndex)
     let winner = await ProposalInstance.findWinner.call()
@@ -157,7 +151,7 @@ contract('Proposal', function(accounts) {
     let creator = await ProposalInstance.creator()
     var tx = {from: creator}
 
-    await AddMemberInstance.run(await DAOInstance.address)
+    await AddMemberInstance1.run(await DAOInstance.address)
 
     let memberJoe = await DAOInstance.members('0x123')
     assert.equal(toString(memberJoe[2]), 'Joe Wang')
@@ -170,7 +164,7 @@ contract('Proposal', function(accounts) {
     let creator = await ProposalInstance.creator()
     var tx = {from: creator}
     var votes = []
-    ADD_MEMBER_INDEX = 3
+    ADD_MEMBER_INDEX = 2
     await ProposalInstance.giveRightToVote(accounts[1], tx)
     await ProposalInstance.vote(ADD_MEMBER_INDEX , {from: accounts[1]})
     votes.push(ADD_MEMBER_INDEX)
@@ -206,5 +200,20 @@ function computeMode(arr) {
 
 function toString(str) {
   return web3.toAscii(str).replace(/\u0000/g, '');
+}
+/**
+ * Helper to wait for log emission.
+ * @param  {Object} _event The event to wait for.
+ */
+function promisifyLogWatch(_event) {
+  return new Promise((resolve, reject) => {
+    _event.watch((error, log) => {
+      _event.stopWatching();
+      if (error !== null)
+        reject(error);
+
+      resolve(log);
+    });
+  });
 }
 

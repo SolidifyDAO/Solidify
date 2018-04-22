@@ -22,14 +22,18 @@ contract DAO {
 }
 
 contract AddMember is owned {
-  uint public i;
+  address targetMember;
+  bytes32 memberName;
+  bytes32 roleName;
 
-  function AddMember() public {
-    i = 0;
+  function AddMember(address _targetMember, bytes32 _memberName, bytes32 _roleName) public {
+    targetMember = _targetMember;
+    memberName = _memberName;
+    roleName = _roleName;
   }
 
   function run(address DAOAddress) public {
     DAO dao = DAO(DAOAddress);
-    dao.addMember(0x123, 'Joe Wang', 'employee');
+    dao.addMember(targetMember, memberName, roleName);
   }
 }
