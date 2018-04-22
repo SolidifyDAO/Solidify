@@ -36,6 +36,7 @@ contract DAO is owned {
 
     struct Proposal {
       address proposal;
+      address[] choices;
       bytes32 name;
       bytes32 desc;
     }
@@ -46,12 +47,14 @@ contract DAO is owned {
         _;
     }
 
-    modifier onlyOwnerOrProposals {
-        bool allow = owner == msg.sender;
+    modifier onlyProposals {
+        bool allow = false;
         for(uint i = 0; i < proposals.length; i++) {
-          if (proposals[i].proposal == msg.sender) {
-            allow = true;
-            break;
+          for(uint j = 0; j < proposals[i].choices.length; j++) {
+            if (proposals[i].choices[j] == msg.sender) {
+              allow = true;
+              break;
+            }
           }
         }
         require(allow);
@@ -81,9 +84,6 @@ contract DAO is owned {
           addRole(_distributionScheme, _roleVotes[i], _roleNames[i]);
         }
 
-        // TODO: Need to decide how owner should be added to the DAO.
-        //addOwner(?);
-
         // create all members
         for (i = 0; i < _memberAddrs.length; i++) {
           addMember(_memberAddrs[i], _memberNames[i], _roleNames[i]);
@@ -102,12 +102,6 @@ contract DAO is owned {
       roleMap[_roleName] = r;
     }
 
-    // TODO: This might be a starting point. I think we want owner info as separate constructor arguments tbh.
-    function addOwner(bytes32 _distributionScheme, uint _roleVotes, bytes32 _ownerName) private {
-      addRole(_distributionScheme, _roleVotes, 'owner');
-      addMember(owner, _ownerName, 'owner');
-    }
-
     /**
      * Add member
      *
@@ -115,7 +109,7 @@ contract DAO is owned {
      * @param _memberName public name for that member
      * @param _roleName public name for the role of this member
      */
-    function addMember(address _targetMember, bytes32 _memberName, bytes32 _roleName)  public {
+    function addMember(address _targetMember, bytes32 _memberName, bytes32 _roleName) onlyProposals public {
       Role roleOfMember = roleMap[_roleName];
       require(roleOfMember != address(0));
 
@@ -130,7 +124,7 @@ contract DAO is owned {
     *
     * @param targetMember ethereum address to be removed
     */
-    function removeMember(address targetMember) onlyOwnerOrProposals public returns(Member) {
+    function removeMember(address targetMember) onlyProposals public returns(Member) {
       Member storage member = members[targetMember];
       require(member.member != address(0));
 
@@ -143,8 +137,8 @@ contract DAO is owned {
        return keccak256(a) == keccak256(b);
     }
 
-    function addProposal(address _proposalAddress, bytes32 _proposalName, bytes32 _description) onlyMembers public {
-      proposals.push(Proposal({proposal: _proposalAddress, name: _proposalName, desc: _description}));
+    function addProposal(address _proposalAddress, bytes32 _proposalName, bytes32 _description, address[] _choices) onlyMembers public {
+      proposals.push(Proposal({proposal: _proposalAddress, name: _proposalName, desc: _description, choices: _choices}));
     }
 }
 
