@@ -53,11 +53,15 @@ contract('Proposal', function(accounts) {
     let voterWhoVoted = await ProposalInstance.voters(accounts[1])
     assert.equal(voterWhoVoted[0], true)
 
-    // an address that shouldn't be able to vote
-    //tx = {from: accounts[2]}
-    //await ProposalInstance.vote(0, tx)
-    //let voterWhoCantVote = await ProposalInstance.voters(accounts[2])
-    //assert.equal(voterWhoVoted[0], false)
+    //an address that shouldn't be able to vote
+    tx = {from: accounts[7]}
+    try {
+      await ProposalInstance.vote(0, tx)
+    } catch (error) {
+      assert(error.message.search('revert') >= 1, true)
+    }
+    let voterWhoCantVote = await ProposalInstance.voters(accounts[7])
+    assert.equal(voterWhoCantVote[0], false)
   })
 
   it("Should not allow voting twice", async() => {

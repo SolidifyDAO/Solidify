@@ -87,7 +87,6 @@ contract Proposal {
     function checkVotingPower(address voter) public returns (uint _votingPower) {
         Role memberRole;
         DAO dao = DAO(DAOaddress);
-        //require(dao.members(voter) != address(0));
         (memberRole, ,)= dao.members(voter);
         _votingPower = memberRole.getVotes();
     }
@@ -98,12 +97,14 @@ contract Proposal {
     function vote(uint choice_index) public {
         Voter storage sender = voters[msg.sender];
         require(!sender.voted);
+
+        DAO dao = DAO(DAOaddress);
+        address voterAddr;
+        (, voterAddr,) = dao.members(msg.sender);
+        require(voterAddr != address(0));
         sender.voted = true;
         sender.vote = choice_index;
 
-        // If `choice_index` is out of the range of the array,
-        // this will throw automatically and revert all
-        // changes.
         choices[choice_index].voteCount += checkVotingPower(msg.sender);
     }
 
