@@ -40,7 +40,6 @@ def createDAO():
 
 @app.route("/createProposal", methods=['POST'])
 def createProposal():
-  print(request.form)
   proposalData = request.form.to_dict()
   proposalData['voting_length'] = time.time() + float(proposalData['voting_length']) * 3600
   proposalData['isAddRole'] = 'votes' in proposalData
@@ -54,6 +53,7 @@ def createProposal():
 @app.route("/sendVote", methods=['POST'])
 def sendVote():
   voteInfo = request.get_json()
+  print(voteInfo)
   timestamp = str(datetime.now()).replace(" ", ":")
   vote_filepath = "".join(["../usergenerated/vote/vote-", timestamp, '.json'])
   with open(vote_filepath, 'w') as f:
@@ -70,12 +70,10 @@ def executeProposal():
 
 
 def run_deployment_script(script_name, args_list):
-  print(os.getcwd())
   old_path = "".join(["../notmigrations/", script_name])
   new_path = "".join(["../migrations/", script_name])
   os.rename(old_path, new_path)
   output = subprocess.check_output(" ".join(["truffle migrate --reset"] + args_list), shell=True)
-  print(output)
   addr = ""
   if script_name == '2_createProposal.js':
     addr = output.decode().split('\n')[-3]
@@ -201,7 +199,6 @@ def dao(h):
   addr = urls[h]
   output = subprocess.check_output(" ".join(["truffle exec ../notmigrations/buildFrontend.js"] + [addr]), shell=True).decode().split('\n')
   output = output[2:-1][0]
-  print(output)
   dao = json.loads(output)
   result = request.args.get('result')
   if (result):
@@ -209,7 +206,6 @@ def dao(h):
     addresses = []
     response = requests.post('http://localhost:5001', json={'addresses': addresses, 'result': result})
     r = response.json()
-    print(dao)
     return render_template('dao.html', dao=dao)
   return redirect(url_for('auth')+'?dao='+h)
 
