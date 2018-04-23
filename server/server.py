@@ -16,33 +16,73 @@ def createDAO():
   daoData = request.get_json()
   print(daoData)
   return "nice."
+  
+@app.route("/createProposal", methods=['POST'])
+def createProposal():
+  print(request.form)
+  print(request.form['name'])
+  return "nice."
 
 @app.route("/tempdao")
 def tempdao():
   choices = [
     { 
       'name': 'Actual',
-      'vote_count': 12,
-      'code': 'fdsafsda'
+      'vote_count': 12
     },
-    { 
+    {
       'name': 'No action',
-      'vote_count': 10,
-      'code': ''
+      'vote_count': 10
     }
   ]
 
   proposals = [{
-    'name': 'Joe Wang',
+    'name': 'Add Member',
     'address': 'idk',
     'description': 'fdsiojfosajodjo fdisjafod ogj  oijsjgosgjoi ffa fda agdsfadfas. asjfoisfjasdfsa.',
-    'choices': choices
+    'choices': choices,
   }, {
-    'name': 'Lucas Nanda',
+    'name': 'Dab on Haters',
     'address': 'addresses',
     'description': 'fdsilafjasfjiofjsak',
     'choices': choices,
   }]
+
+  code=['console.log("hi")', '''pragma solidity ^0.4.16;
+contract owned {
+    address public owner;
+
+    function owned()  public {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner {
+        require(msg.sender == owner);
+        _;
+    }
+
+    function transferOwnership(address newOwner) onlyOwner  public {
+        owner = newOwner;
+    }
+}
+
+contract DAO {
+  function addMember(address _targetMember, bytes32 _memberName, bytes32 _roleName) public;
+}
+
+contract AddMember is owned {
+  uint public i;
+
+  function AddMember() public {
+    i = 0;
+  }
+
+  function run(address DAOAddress) public {
+    DAO dao = DAO(DAOAddress);
+    dao.addMember(0x123, 'Joe Wang', 'employee');
+  }
+}
+''']
 
   members = [{
     'name': 'Joe Wang',
@@ -54,15 +94,26 @@ def tempdao():
     'role': 'Employee'
   }]
 
+  roles = [{
+    'name': 'Role1',
+    'voting_power': 10,
+    'description': 'fdsafsfsafdsa'
+  }, {
+    'name': 'Role2',
+    'voting_power': 15,
+    'description': 'ok then'
+  }]
+
   dao = {
     'name': 'Example DAO',
     'proposals': proposals,
-    'members': members
+    'members': members,
+    'roles': roles
   }
 
   print(dao)
   
-  return render_template('dao.html', dao=dao)
+  return render_template('dao.html', dao=dao, code1=code[0], code2=code[1])
 
 # should use 'flask run' instead
 #if __name__ == '__main__':

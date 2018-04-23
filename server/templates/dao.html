@@ -6,8 +6,373 @@
   <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>
   <link href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700|Roboto:100,300,400,500|Open+Sans" rel="stylesheet">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+  <link href="/static/prism.css" rel="stylesheet" />
+  <style>
+    html, body {
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      font-family: "Lato";
+      color: #444;
+    }
+
+    pre {
+      background: #f5f2f0;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    #mcontainer {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #left-panel {
+      width: 25%;
+      height: 100%;
+      /* background-color:#4d394b; */
+      background-color: #433744;
+      /* color: rgb(202,196,201); */
+      color: #E0E4E9;
+      border-right: 1px solid grey;
+      box-sizing: border-box;
+      float: left;
+    }
+
+    #right-panel {
+      float: right;
+      width: 75%;
+      height: 100%;
+      box-sizing: border-box;
+      overflow: scroll;
+    }
+
+    #title {
+      font-size: 25px;
+      font-weight: 700;
+      color: #fff;
+      width: 100%;
+      border-bottom: 1px solid #aaa;
+      padding: 10px;
+    }
+
+    #proposals-title {
+      font-size: 22px;
+      width: 100%;
+      padding: 10px;
+      color: #eee;
+      margin-top: 10px;
+    }
+
+    #proposals-list {
+      font-size: 18px;
+      font-weight: 300;
+      color: #eee;
+    }
+
+    .proposal {
+      padding: 5px 5px 5px 25px;
+    }
+
+    .proposal:hover {
+      cursor: pointer;
+      background-color: #5c4459;
+      color: #fff;
+    }
+
+    .selected {
+      background-color: #6ec071;
+      color: #fff;
+    }
+    .selected.proposal:hover {
+      background-color: #6ec071;
+    }
+
+    #members-title {
+      font-size: 22px;
+      width: 100%;
+      padding: 10px;
+      color: #eee;
+    }
+
+    #create-title {
+      font-size: 22px;
+      width: 100%;
+      padding: 10px;
+      color: #eee;
+      /* font-weight: 300; */
+    }
+    #create-title:hover {
+      cursor: pointer;
+      background-color: #5c4459;
+      color: #fff;
+    }
+    .selected#create-title:hover {
+      background-color: #6ec071;
+    }
+    #members-list {
+      font-size: 18px;
+      font-weight: 300;
+    }
+
+    .member {
+      padding: 5px 5px 5px 25px;
+    }
+    
+    .p-container {
+      width: 100%;
+      height: 100%;
+      padding: 40px 100px;
+    }
+
+    .p-title {
+      width: 100%;
+      text-align: center;
+      font-size: 40px;
+      font-weight: 700;
+    }
+
+    .p-desc {
+      color: #666;
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: 300;
+      text-align: center;
+    }
+
+    .p-desc-title, .p-choice-title, .p-code-title {
+      width: 100%;
+      text-align: center;
+      font-size: 25px;
+      font-weight: bold;
+      color: #444;
+      margin-top: 70px;
+    }
+
+    .p-desc-title {
+      margin-top: 40px;
+    }
+
+    .p-choice-container {
+      font-size: 18px;
+      margin-top: 50px;
+    }
+
+    .choice-container {
+      text-align: center;
+      border-top: 1px solid #ddd;
+      padding: 20px 0px;
+    }
+
+    .choice-container button {
+      margin-top: 10px;
+    }
+
+    .choice-container:last-of-type {
+      border-bottom: 1px solid #ddd;
+    }
+
+    .choice-name {
+
+    }
+
+    .choice-votes {
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: #388e3c;
+      text-align: center;
+      text-decoration: none;
+      font-size: 16px;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #388e3c;
+    }
+    .fa-plus-square {
+      margin-right: 3px;
+    }
+    .presets {
+      margin-top: 50px;
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+    }
+    .preset {
+      border-radius: 10px;
+      padding: 35px 45px;
+      text-align: center;
+    }
+    .preset:hover {
+      cursor: pointer;
+      background-color: #ddd;
+    }
+    .preset img {
+      height: 100px;
+      width: 100px;
+    }
+  </style>
 </head>
 <body scroll="no">
-  {{ dao.name }}
+  <div id="mcontainer">
+    <div id="left-panel">
+      <div id="title">{{ dao.name }}</div>
+      <div id="proposals-title">Proposals</div>
+      <div id="proposals-list">
+        {% for proposal in dao.proposals %}
+          <div class="proposal" onclick="showProposal('{{ proposal.address }}')">{{ proposal.name }}</div>
+        {% endfor %}
+      </div>
+      <div id="create-title">
+        <i class="fas fa-plus-square"></i>
+        Create Proposal
+      </div>
+      <div id="members-title">Members</div>
+      <div id="members-list">
+        {% for member in dao.members %}
+          <div class="member">{{ member.name }}</div>
+        {% endfor %}
+      </div>
+    </div>
+    <div id="right-panel">
+    </div>
+  </div>
+  <script src="/static/prism.js"></script>
+  <script>
+    console.log('{{ dao | tojson }}')
+    const daoData = JSON.parse('{{ dao | tojson }}')
+    const code = [decodeURIComponent(`{{ code1 | safe }}`), `{{ code2 | safe }}`]
+    const proposals = daoData.proposals
+    $(document).ready(function() {
+      $(".proposal").click(function() {
+        const orig = $(this);
+        $("#create-title").removeClass('selected')
+        $(".proposal").each(function() {
+          const cur = $(this);
+          if (orig.is(cur)) {
+            if (!cur.hasClass('selected')) {
+              cur.addClass('selected')
+            }
+          } else {
+              cur.removeClass('selected')
+          }
+        })
+      })
+      $(".proposal").eq(0).click()
+      $("#create-title").click(function() {
+        $(".proposal").removeClass('selected')
+        $(this).addClass('selected')
+        $('#right-panel').html(`
+          <div class="p-container">
+            <div class="p-title">Select a preset</div>
+            <div class="presets">
+              <div class="preset" onclick="addRoleForm()">
+                <img src="/static/proposal_add.png"><br>
+                Add Role
+              </div>
+              <div class="preset" onclick="hirePersonForm()">
+                <img src="/static/proposal_hire.png"><br>
+                Hire Person
+              </div>
+            </div>
+          </div>`)
+      })
+    })
+
+    function addRoleForm() {
+      $('#right-panel').html(`
+        <div class="p-container">
+          <div class="p-title">Create Proposal (Add Role)</div>
+          <br/><br/>
+          <form id="aform" onsubmit="return submitForm('aform')">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" class="form-control" id="name" name="name" placeholder="Enter name...">
+            </div>
+            <div class="form-group">
+              <label for="votes">Voting Power</label>
+              <input type="number" class="form-control" id="votes" name="votes" placeholder="Enter name...">
+            </div>
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea class="form-control" id="description" name="description"></textarea>
+            </div>
+            <small id="emailHelp" class="form-text text-muted">*Metamask setup is required to create proposals successfully</small><br>
+            <button type="submit" class="btn">Create</button>
+          </form> 
+        </div>`
+        )
+    }
+
+    function hirePersonForm() {
+      $('#right-panel').html(`
+        <div class="p-container">
+          <div class="p-title">Create Proposal (Hire Person)</div>
+          <br/><br/>
+          <form id="hform" onsubmit="return submitForm('hform')">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" class="form-control" id="name" name="name" placeholder="Enter name...">
+            </div>
+            <div class="form-group">
+              <label for="address">Address</label>
+              <input type="text" class="form-control" id="address" name="address" placeholder="Enter name...">
+            </div>
+            <div class="form-group">
+              <label for="role" class="col-form-label">Role</label>
+              <select class="form-control" id="role" name="role">
+                ${daoData.roles.map(({ name }) => `<option value=${name}>${name}</option>`).join("")}
+              </select>
+            </div>
+            <small id="emailHelp" class="form-text text-muted">*Metamask setup is required to create proposals successfully</small><br>
+            <button type="submit" class="btn">Create</button>
+          </form> 
+        </div>`
+        )
+    }
+
+    function showProposal(address) {
+      const index = proposals.findIndex(proposal => proposal.address === address)
+      const proposalToShow = proposals[index]
+      const choices = `
+        <div class="p-choice-container">
+          ${proposalToShow.choices.map(({ name, vote_count }) => 
+            `<div class="choice-container">
+            <div class="choice-name"><b>${name}</b></div>
+            <div class="choice-votes">${vote_count} votes (50%)</div>
+            <button type="button" class="btn">Vote</button>
+            </div>`
+          ).join("")}
+        </div>
+      `
+      $('#right-panel').html(`
+        <div class="p-container">
+          <div class="p-title">${proposalToShow.name} Proposal</div>
+          <div class="p-desc"><div class="p-desc-title">Description</div><br/>${proposalToShow.description}</div>
+          <div class="p-choice-title">Choices</div>
+          ${choices}
+          <div class="choice-code"><div class="p-code-title">Code to be executed</div><br/><pre><code>${Prism.highlight(code[index], Prism.languages.javascript, 'javascript')}</code></div>
+        </div>
+      `)
+    }
+
+    function submitForm(id) {
+      $.ajax({
+        type: "POST",
+        url: 'createProposal',
+        data: $("#"+id).serialize(), // serializes the form's elements.
+        success: function(data)
+        {
+            console.log(data)
+        }
+      })
+      return false
+    }
+  </script>
 </body>
 </html>
