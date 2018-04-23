@@ -6,7 +6,7 @@ function clArgs(index) {
   return process.argv[index + 4]
 }
 
-module.exports = function(deployer) {
+module.exports = async function(deployer) {
   // pull in the json file specific to the dao we want to create
   newProposal = require(clArgs(0));
   let choiceName = null;
@@ -25,16 +25,11 @@ module.exports = function(deployer) {
     // TODO: UNUSED
     roleDescription = newProposal['description']
 
-    deployer.deploy(
+    await deployer.deploy(
       AddRole,
       roleVotingPower,
       roleName
-    ).then(function(instance) {
-      console.log(instance.address);
-    }).catch(function(err) {
-      console.log('ERROR!');
-      console.log(err);
-    });
+    )
 
     choiceName = "Create The '" + roleName + "' Role"
     choiceAddress = (await AddRole.deployed()).address
@@ -44,33 +39,34 @@ module.exports = function(deployer) {
     memberName = newProposal['name']
     memberRole = newProposal['role']
 
-    deployer.deploy(
+    await deployer.deploy(
       AddMember,
       memberAddress,
       memberName,
       memberRole
-    ).then(function(instance) {
+    )/*.then(function(instance) {
       console.log(instance.address);
     }).catch(function(err) {
       console.log('ERROR!');
       console.log(err);
-    });
+    });*/
 
     choiceName = "Hire " + memberName
     choiceAddress = (await AddMember.deployed()).address
   }
 
   // create proposal
-  deployer.deploy(
-    Proposal,
+  instance = await Proposal.new(
     [choiceName],
     [choiceAddress],
+    votingEndTime,
     daoAddress
-  ).then(function(instance) {
+  )/*.then(function(instance) {
     console.log(instance.address);
   }).catch(function(err) {
     console.log('ERROR!');
     console.log(err);
-  });
+  });*/
+  console.log(instance.address)
 
 };

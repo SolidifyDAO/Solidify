@@ -44,9 +44,8 @@ def createProposal():
   proposal_filepath = "".join(["../usergenerated/proposal/proposal-", timestamp, '.json'])
   with open(proposal_filepath, 'w') as f:
     f.write(json.dumps(proposalData, indent=4))
-  run_deployment_script('2_createProposal.js', [proposal_filepath])
-  print(proposalData)
-  return "nice."
+  addr = run_deployment_script('2_createProposal.js', [proposal_filepath])
+  return jsonify({'addr': addr, 'isAddRole': 'votes' in proposalData, 'data': json.dumps(proposalData)})
 
 @app.route("/sendVote", methods=['POST'])
 def sendVote():

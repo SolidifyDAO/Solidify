@@ -223,6 +223,9 @@
       height: 100px;
       width: 100px;
     }
+    .loading {
+      display: none;
+    }
   </style>
 </head>
 <body scroll="no">
@@ -362,7 +365,9 @@
             </div>
             <input type="hidden" name="dao_address" value="${daoData.dao_address}">
             <small id="emailHelp" class="form-text text-muted">*Metamask setup is required to create proposals successfully</small><br>
-            <button type="submit" class="btn">Create</button>
+            <button type="submit" class="btn">Create
+              <span class="loading"><i class="fas fa-spinner fa-spin"></i>
+            </button>
           </form> 
         </div>`
         )
@@ -394,7 +399,9 @@
             </div>
             <input type="hidden" name="dao_address" value="${daoData.dao_address}">
             <small id="emailHelp" class="form-text text-muted">*Metamask setup is required to create proposals successfully</small><br>
-            <button type="submit" class="btn">Create</button>
+            <button type="submit" class="btn">Create
+              <span class="loading"><i class="fas fa-spinner fa-spin"></i>
+            </button>
           </form> 
         </div>`
         )
@@ -409,9 +416,11 @@
         <div class="p-choice-container">
           ${proposalToShow.choices.map(({ name, vote_count }) => 
             `<div class="choice-container">
-            <div class="choice-name"><b>${name}</b></div>
-            <div class="choice-votes">${vote_count} votes (${Math.round(vote_count/total * 100)}%)</div>
-            <button type="button" class="btn big">Vote</button>
+              <div class="choice-name"><b>${name}</b></div>
+              <div class="choice-votes">${vote_count} votes (${total === 0 ? 0 : Math.round(vote_count/total * 100)}%)</div>
+              <button type="button" class="btn big">Vote
+                <span class="loading"><i class="fas fa-spinner fa-spin"></i>
+              </button>
             </div>`
           ).join("")}
         </div>
@@ -429,16 +438,68 @@
     }
 
     function submitForm(id) {
+      $(".loading").show()
       $.ajax({
         type: "POST",
         url: 'createProposal',
         data: $("#"+id).serialize(), // serializes the form's elements.
-        success: function(data)
+        success: function(res)
         {
+          $(".loading").hide()
+          const isAddRole = res.isAddRole
+          const addr = res.addr
+          console.log(res.data)
+          const data = JSON.parse(res.data)
+          data.address = addr
+          if (isAddRole) {
+            data.choices = [
+              {
+                name: 'Do not create role',
+                vote_count: 0,
+              },
+              {
+                name: 'Add role ' + data.name,
+                vote_count: 0,
+              }
+            ]
+          } else {
+            data.choices = [
+              {
+                name: 'Do not hire' + data.name,
+                vote_count: 0,
+              },
+              {
+                name: 'Hire ' + data.name,
+                vote_count: 0,
+              }
+            ]
+          }
           console.log(data)
+          daoData.proposals.push(data)
+          $("#proposals-list").append(
+            `<div class="proposal" onclick="showProposal('${addr}')">${data.name}</div>`
+          )
+          $(".proposal").click(function() {
+            const orig = $(this)
+            $("#create-title").removeClass('selected')
+            $(".proposal").each(function() {
+              const cur = $(this);
+              if (orig.is(cur)) {
+                if (!cur.hasClass('selected')) {
+                  cur.addClass('selected')
+                }
+              } else {
+                  cur.removeClass('selected')
+              }
+            })
+          })
         }
       })
       return false
+    }
+
+    function addRole(name) {
+      $("#role").append(`<option value=${name}>${name}</option>`)
     }
   </script>
 </body>
