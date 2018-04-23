@@ -1,4 +1,19 @@
+# Solidity and JS
 build/
 node_modules/
 .logs/*
 !.logs/.placeholder
+
+# Flask
+.DS_Store
+.env
+.flaskenv
+*.pyc
+env/
+env*
+dist/
+build/
+.cache/
+venv/
+
+.vscode
