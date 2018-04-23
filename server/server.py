@@ -48,9 +48,7 @@ def createProposal():
   with open(proposal_filepath, 'w') as f:
     f.write(json.dumps(proposalData, indent=4))
   addr = run_deployment_script('2_createProposal.js', [proposal_filepath])
-  end_time = time.time() + float(proposalData['voting_length']) * 3600
-  print(end_time)
-  return jsonify({'end_time': end_time, 'addr': addr, 'isAddRole': 'votes' in proposalData, 'data': json.dumps(proposalData)})
+  return jsonify({'end_time': proposalData['voting_length'], 'addr': addr, 'isAddRole': 'votes' in proposalData, 'data': json.dumps(proposalData)})
 
 @app.route("/sendVote", methods=['POST'])
 def sendVote():
