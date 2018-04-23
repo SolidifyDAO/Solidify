@@ -618,9 +618,11 @@
 
     function addRole(name) {
       $("#role").append(`<option value=${name}>${name}</option>`)
+      daoData.roles.push({ name })
     }
     function addMember(name) {
       $("#members-list").append(`<div class="member">${name}</div>`)
+      daoData.members.push({ name })
     }
     function sendVote(proposalAddr, index) {
       console.log(proposalAddr)
@@ -638,13 +640,15 @@
         success: function(data) {
           console.log(data)
           $(`#${proposalAddr}_${index}`).text(data.updatedCount)
+          const p = proposals.find(proposal => proposal.address === proposalAddr)
+          p.choices[index].vote_count = data.updatedCount
           $(".loading"+index).hide()
         }
       })
     }
     function executeProposal(proposalAddr) {
       $(".loading").show()
-      const p = proposals.find(proposal => proposal.address === address)
+      const p = proposals.find(proposal => proposal.address === proposalAddr)
       $.ajax({
         type: "POST",
         url: 'executeProposal',
@@ -653,10 +657,13 @@
         success: function(data) {
           $(`#${proposalAddr}_${data.winningChoiceIdx}_dab`).addClass('winner')
           $(".loading").hide()
-          if (p.isAddRole) {
-            addRole(p.name)
-          } else {
-            addMember(p.name)
+          $(button).attr("disabled","disabled")
+          if (data.winningChoiceIdx === 1) {
+            if (p.isAddRole) {
+              addRole(p.name)
+            } else {
+              addMember(p.name)
+            }
           }
         }
       })
