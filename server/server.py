@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime
 from pprint import pformat
 import os
 import subprocess
 from flask import jsonify
 import json
+import requests
 
 app = Flask(__name__)
 
@@ -17,6 +18,11 @@ urls = {}
 @app.route("/")
 def hello():
   return render_template('entry.html')
+
+@app.route("/auth")
+def auth():
+  dao = request.args.get('dao')
+  return render_template('auth.html', dao=dao)
 
 @app.route("/createDAO", methods=['POST'])
 def createDAO():
@@ -144,10 +150,30 @@ contract AddMember is owned {
 
   return render_template('dao.html', dao=dao, code1=code[0], code2=code[1])
 
+'''@app.route("/verify")
+def verify():
+  dao = request.args.get('dao')
+  result = request.args.get('result')
+  # TODO: get real addresses from dao
+  addresses = ['0x492b173e4bde8c8b225a8df4dc6fdecdf5af1c1a']
+  response = requests.post('http://localhost:5001', json={'addresses': addresses, 'result': result})
+  r = response.json()
+  print(r)
+  return redirect('/'+dao)'''
+
 @app.route("/<string:h>")
 def dao(h):
   addr = urls[h]
-  return addr
+  result = request.args.get('result')
+  if (result):
+    # TODO: get real addresses from dao
+    addresses = ['0x492b173e4bde8c8b225a8df4dc6fdecdf5af1c1a']
+    response = requests.post('http://localhost:5001', json={'addresses': addresses, 'result': result})
+    r = response.json()
+    print(r)
+    # TODO: render dao page
+    return "rendered dao!"
+  return redirect(url_for('auth')+'?dao='+h)
 
 # should use 'flask run' instead
 if __name__ == '__main__':

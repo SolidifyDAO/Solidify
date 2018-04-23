@@ -1,8 +1,10 @@
 <html>
 <head>
+  <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon"> 
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+  <script src="/static/moment.js"></script>
   <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>
   <link href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700|Roboto:100,300,400,500|Open+Sans" rel="stylesheet">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
@@ -170,6 +172,11 @@
       padding: 20px 35px;
       font-size: 22px;
     }
+    .timer {
+      text-align: center;
+      font-size: 16px;
+      color: #777;
+    }
     .big {
       padding: 15px 20px;
     }
@@ -246,7 +253,7 @@
   <script>
     console.log('{{ dao | tojson }}')
 
-    const CHALLENGE_DESCRIPTION = "Authorization challenge"
+    /*const CHALLENGE_DESCRIPTION = "Authorization challenge"
     const CHALLENGE_VALUE = "from getline"
 
     const msgParams = [{
@@ -281,11 +288,20 @@
           console.log('Failed to verify signer when comparing ' + result + ' to ' + address)
         }
       })
-    })
+    })*/
 
     const daoData = JSON.parse('{{ dao | tojson }}')
     const code = [decodeURIComponent(`{{ code1 | safe }}`), `{{ code2 | safe }}`]
     const proposals = daoData.proposals
+    setInterval(function() {
+      $(".timer").each(function() {
+        const goalTime = $(this).data('time')
+        const start = moment(new Date()) 
+        const end = moment(goalTime)
+        const diff = moment.duration(end.diff(start))
+        $(".timer").text(`${Math.floor(diff.asHours())} hours ${diff.minutes()} minutes and ${diff.seconds()} seconds left`)
+      })
+    })
     $(document).ready(function() {
       $(".proposal").click(function() {
         const orig = $(this)
@@ -401,6 +417,7 @@
       $('#right-panel').html(`
         <div class="p-container">
           <div class="p-title">${proposalToShow.name} Proposal</div>
+        <div class="timer" data-time="${new Date(2018, 3, 23, 23).getTime()}"></div>
           <div class="p-desc"><div class="p-desc-title">Description</div><br/>${proposalToShow.description}</div>
           <div class="p-choice-title">Choices</div>
           ${choices}
@@ -416,7 +433,7 @@
         data: $("#"+id).serialize(), // serializes the form's elements.
         success: function(data)
         {
-            console.log(data)
+          console.log(data)
         }
       })
       return false
