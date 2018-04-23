@@ -157,7 +157,7 @@
       width: 100%;
       justify-content: center;
     }
-    
+
     .voting_scheme_container {
       display: flex;
       padding: 20px;
@@ -307,7 +307,7 @@
     .list_role_item:last-of-type {
       margin-bottom: 0px;
     }
-    
+
     .list_role_item_name {
       display: inline-block;
       margin: 10px 0px;
@@ -338,7 +338,7 @@
     #back_btn:hover {
       cursor: pointer;
     }
-    
+
     #add_role_next {
       position: fixed;
       bottom: 50px;
@@ -416,7 +416,7 @@
     .list_member_item:last-of-type {
       margin-bottom: 0px;
     }
-    
+
     .list_member_item_name {
       display: inline-block;
       margin: 10px 0px;
@@ -465,21 +465,21 @@
   <div class="page" id="voting">
     <span class="voting_title">How should votes work?</span>
     <div class="voting_schemes_container">
-      <div class="voting_scheme_container" onClick="addDaoDataAndMoveTo('voting', 'flatIndividual', '#add_roles')">
+      <div class="voting_scheme_container" onClick="addDaoDataAndMoveTo('voting', 'FlatIndividual', '#add_roles')">
         <span class="voting_scheme_title">Flat Individual</span>
         <img src="/static/role.png" class="voting_img">
         <span class="voting_scheme_text">
-          Your organization will be broken down into several roles. Members get voting power based on the role they belong to. 
+          Your organization will be broken down into several roles. Members get voting power based on the role they belong to.
         </span>
       </div>
-      <div class="voting_scheme_container" onClick="addDaoDataAndMoveTo('voting', 'flatRole', '#add_roles')">
+      <div class="voting_scheme_container" onClick="addDaoDataAndMoveTo('voting', 'FlatGroup', '#add_roles')">
         <span class="voting_scheme_title">Flat Role</span>
         <img src="/static/group.png" class="voting_img">
         <span class="voting_scheme_text">
           Your organization will consists of roles, each with a defined amount of total voting power. Adding more members to a role decreases the voting power of members within that role.
         </span>
       </div>
-      <div class="voting_scheme_container" onClick="addDaoDataAndMoveTo('voting', 'basePercent', '#add_roles')">
+      <div class="voting_scheme_container" onClick="addDaoDataAndMoveTo('voting', 'PercentageBased', '#add_roles')">
         <span class="voting_scheme_title">Percentage-Based</span>
         <img src="/static/percent.png" class="voting_img">
         <span class="voting_scheme_text">
@@ -721,7 +721,7 @@
     function addDaoData(key, value) {
       daoData[key] = value
       if (key === 'voting') {
-        if (value === 'basePercent') {
+        if (value === 'PercentageBased') {
           $('.add_title').text('Add Your Investors')
           $('.voting_scheme_fill').text('Percentage-Based')
           $('.fill_roles').text('investors')
@@ -731,7 +731,7 @@
             $('.add_title').text('Create Your Roles')
             $('.fill_roles').text('roles')
             $('.fill_role').text('role')
-          if (value === 'flatRole') {
+          if (value === 'FlatRole') {
             $('.voting_scheme_fill').text('Flat Role')
             $('#question_tooltip').tooltip({ title: 'Value to specifiy the total voting power of each role' })
           } else {

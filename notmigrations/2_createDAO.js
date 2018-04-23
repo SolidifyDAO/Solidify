@@ -7,6 +7,7 @@ function clArgs(index) {
 module.exports = function(callback) {
   // pull in the json file specific to the dao we want to create
   newDao = require(clArgs(0));
+  console.log(newDao)
 
   daoName = newDao['name'];
   distScheme = newDao['voting'];
@@ -17,7 +18,7 @@ module.exports = function(callback) {
   memberRoles = newDao['members'].map(function(member) { return member['role'] });
 
   DAO.new(
-    daoName, 
+    daoName,
     distScheme,
     roleNames,
     roleVotes,
