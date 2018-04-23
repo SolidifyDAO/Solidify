@@ -5,7 +5,6 @@ import os
 import subprocess
 from flask import jsonify
 import json
-import simplejson
 import requests
 
 app = Flask(__name__)
@@ -190,9 +189,9 @@ def verify():
 @app.route("/<string:h>")
 def dao(h):
   addr = urls[h]
-  output = subprocess.check_output(" ".join(["truffle exec ../notmigrations/buildFrontend.js"] + [addr]), shell=True).split('\n')
+  output = subprocess.check_output(" ".join(["truffle exec ../notmigrations/buildFrontend.js"] + [addr]), shell=True).decode().split('\n')
   output = output[2:-1][0]
-  print output
+  print(output)
   dao = json.loads(output)
   result = request.args.get('result')
   if (result):
@@ -200,7 +199,7 @@ def dao(h):
     addresses = []
     response = requests.post('http://localhost:5001', json={'addresses': addresses, 'result': result})
     r = response.json()
-    print(r)
+    print(dao)
     return render_template('dao.html', dao=dao, code=[])
   return redirect(url_for('auth')+'?dao='+h)
 

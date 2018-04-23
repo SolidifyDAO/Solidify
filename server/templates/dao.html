@@ -353,13 +353,14 @@
               <input type="number" class="form-control" id="votes" name="votes" placeholder="Enter numeric voting power...">
             </div>
             <div class="form-group">
-              <label for="voting-length">Voting Period Length</label>
-              <input type="number" class="form-control" id="voting-length" name="voting-length" placeholder="Enter number of hours...">
+              <label for="voting_length">Voting Period Length</label>
+              <input type="number" class="form-control" id="voting_length" name="voting_length" placeholder="Enter number of hours...">
             </div>
             <div class="form-group">
               <label for="description">Description</label>
               <textarea class="form-control" id="description" name="description"></textarea>
             </div>
+            <input type="hidden" name="dao_address" value="${daoData.dao_address}">
             <small id="emailHelp" class="form-text text-muted">*Metamask setup is required to create proposals successfully</small><br>
             <button type="submit" class="btn">Create</button>
           </form> 
@@ -382,8 +383,8 @@
               <input type="text" class="form-control" id="address" name="address" placeholder="Enter numeric voting power...">
             </div>
             <div class="form-group">
-              <label for="voting-length">Voting Period Length</label>
-              <input type="number" class="form-control" id="voting-length" name="voting-length" placeholder="Enter number of hours...">
+              <label for="voting_length">Voting Period Length</label>
+              <input type="number" class="form-control" id="voting_length" name="voting_length" placeholder="Enter number of hours...">
             </div>
             <div class="form-group">
               <label for="role" class="col-form-label">Role</label>
@@ -391,6 +392,7 @@
                 ${daoData.roles.map(({ name }) => `<option value=${name}>${name}</option>`).join("")}
               </select>
             </div>
+            <input type="hidden" name="dao_address" value="${daoData.dao_address}">
             <small id="emailHelp" class="form-text text-muted">*Metamask setup is required to create proposals successfully</small><br>
             <button type="submit" class="btn">Create</button>
           </form> 
