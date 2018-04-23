@@ -175,13 +175,6 @@
       border-bottom: 1px solid #ddd;
     }
 
-    .choice-name {
-
-    }
-
-    .choice-votes {
-    }
-
     button {
       background-color: #4CAF50;
       color: white;
@@ -245,12 +238,50 @@
   <script src="/static/prism.js"></script>
   <script>
     console.log('{{ dao | tojson }}')
+
+    const CHALLENGE_DESCRIPTION = "Authorization challenge"
+    const CHALLENGE_VALUE = "from getline"
+
+    const msgParams = [{
+      type: 'string',
+      name: CHALLENGE_DESCRIPTION,
+      value: CHALLENGE_VALUE
+    }];
+
+    web3.eth.getAccounts((err, accounts) => {
+      console.log(err)
+      console.log(accounts)
+      var address = accounts[0]
+      var params = [msgParams, address]
+      var method = 'eth_signTypedData'
+      web3.currentProvider.sendAsync({
+        method,
+        params,
+        address,
+      }, function (err, result) {
+        if (err) return console.dir(err)
+        if (result.error) {
+          alert(result.error.message)
+        }
+        if (result.error) return console.error(result)
+        console.log('PERSONAL SIGNED:' + JSON.stringify(result.result))
+
+        const recovered = sigUtil.recoverTypedSignature({ data: msgParams, sig: result.result })
+        if (recovered === address) {
+          console.log('Successfully ecRecovered signer as ' + address)
+          onSuccess(result.result);
+        } else {
+          console.log('Failed to verify signer when comparing ' + result + ' to ' + address)
+        }
+      })
+    })
+
     const daoData = JSON.parse('{{ dao | tojson }}')
     const code = [decodeURIComponent(`{{ code1 | safe }}`), `{{ code2 | safe }}`]
     const proposals = daoData.proposals
     $(document).ready(function() {
       $(".proposal").click(function() {
-        const orig = $(this);
+        const orig = $(this)
         $("#create-title").removeClass('selected')
         $(".proposal").each(function() {
           const cur = $(this);
@@ -339,12 +370,14 @@
     function showProposal(address) {
       const index = proposals.findIndex(proposal => proposal.address === address)
       const proposalToShow = proposals[index]
+      let total = 0
+      proposalToShow.choices.forEach(({ vote_count }) => total += vote_count)
       const choices = `
         <div class="p-choice-container">
           ${proposalToShow.choices.map(({ name, vote_count }) => 
             `<div class="choice-container">
             <div class="choice-name"><b>${name}</b></div>
-            <div class="choice-votes">${vote_count} votes (50%)</div>
+            <div class="choice-votes">${vote_count} votes (${Math.round(vote_count/total * 100)}%)</div>
             <button type="button" class="btn">Vote</button>
             </div>`
           ).join("")}
