@@ -33,7 +33,13 @@ def createDAO():
 @app.route("/createProposal", methods=['POST'])
 def createProposal():
   print(request.form)
-  print(request.form['name'])
+  proposalData = request.form
+  timestamp = str(datetime.now()).replace(" ", ":")
+  proposal_filepath = "".join(["../usergenerated/proposal/proposal-", timestamp, '.json'])
+  with open(proposal_filepath, 'w') as f:
+    f.write(json.dumps(proposalData, indent=4))
+  run_deployment_script('2_createProposal.js', [proposal_filepath])
+  print(proposalData)
   return "nice."
 
 def run_deployment_script(script_name, args_list):
