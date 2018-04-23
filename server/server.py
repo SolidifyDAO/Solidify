@@ -70,7 +70,7 @@ def run_deployment_script(script_name, args_list):
   return addr
 
 def run_vote_script(args_list):
-  output = subprocess.check_output(" ".join(["truffle exec voteScript.js"] + args_list), shell=True)
+  output = subprocess.check_output(" ".join(["truffle exec ../notmigrations/voteScript.js"] + args_list), shell=True)
   vote_count = output.decode().split('\n')[-2]
   return vote_count
 
@@ -148,11 +148,9 @@ contract AddMember is owned {
   roles = [{
     'name': 'Role1',
     'voting_power': 10,
-    'description': 'fdsafsfsafdsa'
   }, {
     'name': 'Role2',
     'voting_power': 15,
-    'description': 'ok then'
   }]
 
   dao = {
@@ -164,7 +162,7 @@ contract AddMember is owned {
 
   print(dao)
 
-  return render_template('dao.html', dao=dao, code1=code[0], code2=code[1])
+  return render_template('dao.html', dao=dao, code=code)
 
 '''@app.route("/verify")
 def verify():
@@ -182,13 +180,16 @@ def dao(h):
   addr = urls[h]
   result = request.args.get('result')
   if (result):
+    output = subprocess.check_output(" ".join(["truffle exec ../notmigrations/buildFrontend.js"] + [addr]), shell=True)
+    print output
     # TODO: get real addresses from dao
-    addresses = ['0x492b173e4bde8c8b225a8df4dc6fdecdf5af1c1a']
+    addresses = []
     response = requests.post('http://localhost:5001', json={'addresses': addresses, 'result': result})
     r = response.json()
     print(r)
     # TODO: render dao page
     return "rendered dao!"
+    #return render_template('dao.html', dao=dao, code=code)
   return redirect(url_for('auth')+'?dao='+h)
 
 # should use 'flask run' instead
