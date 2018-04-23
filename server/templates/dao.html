@@ -226,6 +226,13 @@
     .loading {
       display: none;
     }
+    .execute-btn-div {
+      text-align: center;
+    }
+    .execute-btn {
+      padding: 15px 20px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body scroll="no">
@@ -378,9 +385,22 @@
       $(".timer").each(function() {
         const goalTime = $(this).data('time')
         const start = moment(new Date()) 
-        const end = moment(goalTime)
+        const end = moment.unix(goalTime)
         const diff = moment.duration(end.diff(start))
-        $(".timer").text(`${Math.floor(diff.asHours())} hours ${diff.minutes()} minutes and ${diff.seconds()} seconds left`)
+        const hours = Math.floor(diff.asHours())
+        const minutes = diff.minutes()
+        const seconds = diff.seconds()
+        if (hours < 0 || minutes < 0 || seconds < 0) {
+          $(this).removeClass('timer')
+          $(this).addClass('execute-btn-div')
+          $(this).html(`
+            <button class="btn execute-btn">Execute
+              <span class="loading"><i class="fas fa-spinner fa-spin"></i>
+            </button>
+           `)
+        } else {
+          $(".timer").text(`${hours ? hours + ' hours ' : ''} ${minutes ? minutes + ' minutes ' : ''} ${seconds ? seconds + ' seconds ' : ''}`)
+        }
       })
     })
     $(document).ready(function() {
@@ -510,7 +530,7 @@
       $('#right-panel').html(`
         <div class="p-container">
           <div class="p-title">${proposalToShow.name} Proposal</div>
-        <div class="timer" data-time="${new Date(2018, 3, 23, 23).getTime()}"></div>
+        <div class="timer" data-time="${proposalToShow.end_time}"></div>
           <div class="p-desc"><div class="p-desc-title">Description</div><br/>${proposalToShow.description}</div>
           <div class="p-choice-title">Choices</div>
           ${choices}
@@ -530,7 +550,7 @@
           $(".loading").hide()
           const isAddRole = res.isAddRole
           const addr = res.addr
-          console.log(res.data)
+          const end_time = res.end_time
           const data = JSON.parse(res.data)
           data.address = addr
           if (isAddRole) {
@@ -558,6 +578,7 @@
             ]
             data.code = hireCode
           }
+          data.end_time = end_time
           console.log(data)
           daoData.proposals.push(data)
           $("#proposals-list").append(
