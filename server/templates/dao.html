@@ -226,6 +226,12 @@
     .loading {
       display: none;
     }
+    .loading1 {
+      display: none;
+    }
+    .loading0 {
+      display: none;
+    }
     .execute-btn-div {
       text-align: center;
     }
@@ -381,6 +387,7 @@
 
     const daoData = JSON.parse('{{ dao | tojson }}')
     const proposals = daoData.proposals
+    const userAddr = web3.eth.accounts[0]
     setInterval(function() {
       $(".timer").each(function() {
         const goalTime = $(this).data('time')
@@ -512,16 +519,16 @@
     function showProposal(address) {
       const index = proposals.findIndex(proposal => proposal.address === address)
       const proposalToShow = proposals[index]
-      let total = 0
-      proposalToShow.choices.forEach(({ vote_count }) => total += vote_count)
+      // let total = 0
+      // proposalToShow.choices.forEach(({ vote_count }) => total += vote_count)
       const choices = `
         <div class="p-choice-container">
-          ${proposalToShow.choices.map(({ name, vote_count }) => 
+          ${proposalToShow.choices.map(({ name, vote_count }, index) => 
             `<div class="choice-container">
               <div class="choice-name"><b>${name}</b></div>
-              <div class="choice-votes">${vote_count} votes (${total === 0 ? 0 : Math.round(vote_count/total * 100)}%)</div>
-              <button type="button" class="btn big">Vote
-                <span class="loading"><i class="fas fa-spinner fa-spin"></i>
+              <div class="choice-votes"><span id="${address}_${index}">${vote_count}</span> votes</div>
+              <button type="button" class="btn big" onclick="sendVote('${proposalToShow.address}', ${index})">Vote
+                <span class="loading${index}"><i class="fas fa-spinner fa-spin"></i>
               </button>
             </div>`
           ).join("")}
@@ -605,6 +612,24 @@
 
     function addRole(name) {
       $("#role").append(`<option value=${name}>${name}</option>`)
+    }
+    function sendVote(proposalAddr, index) {
+      const d = {
+        proposalAddr,
+        index,
+        userAddr,
+      }
+      $(".loading"+index).show()
+      $.ajax({
+        type: "POST",
+        url: 'sendVote',
+        dataType: 'json',
+        data: d,
+        success: function(data) {
+          $(`#${proposalAddr}_${index}`).text(data.updatedCount)
+          $(".loading"+index).hide()
+        }
+      })
     }
   </script>
 </body>
