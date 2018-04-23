@@ -6,19 +6,14 @@ function clArgs(index) {
 
 module.exports = async function(callback) {
   // pull in the json file with information on this vote request
-  voteInfo = require(clArgs(0));
-  console.log(voteInfo)
+  proposalAddress = clArgs(0);
+  console.log(proposalAddress)
 
-  voteIndex = voteInfo['index'];
-  proposalAddr = voteInfo['proposalAddr'];
-  userAddr = voteInfo['userAddr'];
+  let proposalInstance = await Proposal.at(proposalAddress)
+  let winningChoiceIndex = await proposalInstance.winningChoice()
 
-  let proposalInstance = await Proposal.at(proposalAddr)
-  var tx = {from: userAddr}
-  await ProposalInstance.vote(voteIndex, tx)
-
-  let votedChoice = await ProposalInstance.choices(voteIndex)
-  console.log(votedChoice[1].toNumber())
+  await proposalInstance.executeWinner()
+  console.log(winningChoiceIndex.toNumber())
 };
 
 

@@ -59,6 +59,12 @@ def sendVote():
   updated_count = run_vote_script([vote_filepath])
   return jsonify({'updatedCount': updated_count})
 
+@app.route("/executeProposal", methods=['POST'])
+def executeProposal():
+  proposalAddress = request.get_json()['proposalAddress']
+  winning_choice_index = run_exec_choice_script([proposalAddress])
+  return jsonify({'winningChoiceIdx': winning_choice_index})
+
 
 def run_deployment_script(script_name, args_list):
   print(os.getcwd())
@@ -74,6 +80,11 @@ def run_vote_script(args_list):
   output = subprocess.check_output(" ".join(["truffle exec ../notmigrations/voteScript.js"] + args_list), shell=True)
   vote_count = output.decode().split('\n')[-2]
   return vote_count
+
+def run_exec_choice_script(args_list):
+  output = subprocess.check_output(" ".join(["truffle exec ../notmigrations/executeChoiceScript.js"] + args_list), shell=True)
+  winnerIndex = output.decode().split('\n')[-2]
+  return winnerIndex
 
 @app.route("/tempdao")
 def tempdao():
