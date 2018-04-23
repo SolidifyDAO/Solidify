@@ -58,6 +58,7 @@ def sendVote():
   with open(vote_filepath, 'w') as f:
     f.write(json.dumps(voteInfo, indent=4))
   updated_count = run_vote_script([vote_filepath])
+  print(updated_count)
   return jsonify({'updatedCount': updated_count})
 
 @app.route("/executeProposal", methods=['POST'])
@@ -73,7 +74,13 @@ def run_deployment_script(script_name, args_list):
   new_path = "".join(["../migrations/", script_name])
   os.rename(old_path, new_path)
   output = subprocess.check_output(" ".join(["truffle migrate --reset"] + args_list), shell=True)
-  addr = output.decode().split('\n')[-2]
+  print(output)
+  addr = ""
+  if script_name == '2_createProposal.js':
+    addr = output.decode().split('\n')[-3]
+  else:
+    addr = output.decode().split('\n')[-2]
+
   os.rename(new_path, old_path)
   return addr
 

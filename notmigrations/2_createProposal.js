@@ -27,45 +27,45 @@ module.exports = async function(deployer) {
     // TODO: UNUSED
     roleDescription = newProposal['description']
 
-    await deployer.deploy(
-      AddRole,
+    let addRoleInstance = await AddRole.new(
       roleVotingPower,
       roleName
     )
 
     choiceName = "Create The '" + roleName + "' Role"
-    choiceAddress = (await AddRole.deployed()).address
+    choiceAddress = addRoleInstance.address
   } else if (newProposal['type'] == 'HirePerson') {
     // deploy AddMember proposal
     memberAddress = newProposal['address']
     memberName = newProposal['name']
     memberRole = newProposal['role']
 
-    await deployer.deploy(
-      AddMember,
+    let addMemberInstance = await AddMember.new(
       memberAddress,
       memberName,
       memberRole
     )
 
     choiceName = "Hire " + memberName
-    choiceAddress = (await AddMember.deployed()).address
+    choiceAddress = addMemberInstance.address
   }
 
   // create proposal
-  instance = await Proposal.new(
+  let daoInstance = await DAO.at(daoAddress)
+
+  Proposal.new(
     [choiceName],
     [choiceAddress],
     votingEndTime,
     daoAddress
-  )
+  ).then(function(instance) {
+    console.log(instance.address);
+    // add the proposal we created to the DAO
+    daoInstance.addProposal(instance.address, newProposal['name'], newProposal['description'], [choiceAddress])
+  }).catch(function(err) {
+    console.log('ERROR!');
+    console.log(err);
+  });
 
-  // add the proposal we created to the DAO
-  console.log("fack")
-  console.log(daoAddress)
-  let daoInstance = await DAO.at(daoAddress)
-  daoInstance.addProposal(instance.address, newProposal['name'], newProposal['description'], [choiceAddress])
-
-  console.log(instance.address)
 
 };
