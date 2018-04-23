@@ -398,8 +398,6 @@
         const goalTime = $(this).data('time')
         const start = moment(new Date()) 
         const end = moment.unix(goalTime)
-        console.log(goalTime)
-        console.log(end.format())
         const diff = moment.duration(end.diff(start))
         const hours = Math.floor(diff.asHours())
         const minutes = diff.minutes()
@@ -567,6 +565,7 @@
           const addr = res.addr
           const end_time = res.end_time
           const data = JSON.parse(res.data)
+          console.log(addr)
           data.address = addr
           if (isAddRole) {
             data.choices = [
@@ -620,7 +619,11 @@
     function addRole(name) {
       $("#role").append(`<option value=${name}>${name}</option>`)
     }
+    function addMember(name) {
+      $("#members-list").append(`<div class="member">${name}</div>`)
+    }
     function sendVote(proposalAddr, index) {
+      console.log(proposalAddr)
       const d = {
         proposalAddr,
         index,
@@ -641,6 +644,7 @@
     }
     function executeProposal(proposalAddr) {
       $(".loading").show()
+      const p = proposals.find(proposal => proposal.address === address)
       $.ajax({
         type: "POST",
         url: 'executeProposal',
@@ -649,6 +653,11 @@
         success: function(data) {
           $(`#${proposalAddr}_${data.winningChoiceIdx}_dab`).addClass('winner')
           $(".loading").hide()
+          if (p.isAddRole) {
+            addRole(p.name)
+          } else {
+            addMember(p.name)
+          }
         }
       })
     }
