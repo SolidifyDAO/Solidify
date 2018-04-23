@@ -138,6 +138,11 @@ contract AddMember is owned {
 
   return render_template('dao.html', dao=dao, code1=code[0], code2=code[1])
 
+@app.route("/<string:h>")
+def dao(h):
+  addr = urls[h]
+  return addr
+
 # should use 'flask run' instead
 if __name__ == '__main__':
   port = int(os.environ.get('PORT', 5000))
