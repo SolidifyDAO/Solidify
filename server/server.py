@@ -3,6 +3,7 @@ from datetime import datetime
 from pprint import pformat
 import os
 import subprocess
+from flask import jsonify
 import json
 
 app = Flask(__name__)
@@ -22,10 +23,9 @@ def createDAO():
   dao_filepath = "".join(["../usergenerated/dao/dao-", timestamp, '.json'])
   with open(dao_filepath, 'w') as f:
     f.write(json.dumps(daoData, indent=4))
-  run_deployment_script('2_createDAO.js', [dao_filepath])
-  print(daoData)
-  return "nice."
-  
+  addr = run_deployment_script('2_createDAO.js', [dao_filepath])
+  return jsonify({'addr': addr})
+
 @app.route("/createProposal", methods=['POST'])
 def createProposal():
   print(request.form)
@@ -37,14 +37,15 @@ def run_deployment_script(script_name, args_list):
   old_path = "".join(["../notmigrations/", script_name])
   new_path = "".join(["../migrations/", script_name])
   os.rename(old_path, new_path)
-  output = subprocess.check_output(" ".join(["truffle migrate"] + args_list), shell=True)
-  print(output)
+  output = subprocess.check_output(" ".join(["truffle migrate --reset"] + args_list), shell=True)
+  addr = output.split('\n')[-2]
   os.rename(new_path, old_path)
+  return addr
 
 @app.route("/tempdao")
 def tempdao():
   choices = [
-    { 
+    {
       'name': 'Actual',
       'vote_count': 12
     },
@@ -130,7 +131,7 @@ contract AddMember is owned {
   }
 
   print(dao)
-  
+
   return render_template('dao.html', dao=dao, code1=code[0], code2=code[1])
 
 # should use 'flask run' instead

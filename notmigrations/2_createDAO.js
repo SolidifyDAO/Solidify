@@ -1,13 +1,12 @@
 var DAO = artifacts.require('./DAO.sol');
 
 function clArgs(index) {
-  return process.argv[index + 3]
+  return process.argv[index + 4]
 }
 
 module.exports = function(callback) {
   // pull in the json file specific to the dao we want to create
   newDao = require(clArgs(0));
-  console.log(newDao)
 
   daoName = newDao['name'];
   distScheme = newDao['voting'];
