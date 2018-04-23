@@ -84,7 +84,7 @@ contract Proposal {
         }
     }
 
-    function checkVotingPower(address voter) public returns (uint _votingPower) {
+    function checkVotingPower(address voter) public view returns (uint _votingPower) {
         Role memberRole;
         DAO dao = DAO(DAOaddress);
         (memberRole, ,)= dao.members(voter);

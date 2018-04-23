@@ -36,6 +36,7 @@ contract('Proposal', function(accounts) {
   await DAOInstance.addProposal(ProposalInstance.address, 'MyProposal', 'MyProposalDesc', dummyList, tx)
   })
 
+  /* Voting logic tests */
   it("Should initialize poll with 0 votes correctly",  async() => {
     for (i = 0; i < choicesList.length; i++) {
       let choice = await ProposalInstance.choices(i)
@@ -115,6 +116,8 @@ contract('Proposal', function(accounts) {
     computedWinner = choicesList[computeMode(votes)]
     assert.equal(toString(winner), computedWinner)
   })
+
+  /* Choice Contract Tests */
   it("Should check that dummy increments1", async() => {
     // sets up 5 accounts to vote on a random choice.
     assert(await DummyInstance1.i(), 0)
@@ -225,19 +228,3 @@ function computeMode(arr) {
 function toString(str) {
   return web3.toAscii(str).replace(/\u0000/g, '');
 }
-/**
- * Helper to wait for log emission.
- * @param  {Object} _event The event to wait for.
- */
-function promisifyLogWatch(_event) {
-  return new Promise((resolve, reject) => {
-    _event.watch((error, log) => {
-      _event.stopWatching();
-      if (error !== null)
-        reject(error);
-
-      resolve(log);
-    });
-  });
-}
-
