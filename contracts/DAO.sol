@@ -116,6 +116,10 @@ contract DAO is owned {
     function getRoleCount() public view returns (uint) {
         return roleNames.length;
     }
+
+    function getProposalCount() public view returns (uint) {
+        return proposals.length;
+    }
     /**
      * Add member
      *
@@ -159,7 +163,7 @@ contract DAO is owned {
        return keccak256(a) == keccak256(b);
     }
 
-    function addProposal(address _proposalAddress, bytes32 _proposalName, bytes32 _description, address[] _choices) onlyMembers public {
+    function addProposal(address _proposalAddress, bytes32 _proposalName, bytes32 _description, address[] _choices)  public {
       proposals.push(Proposal({proposal: _proposalAddress, name: _proposalName, desc: _description, choices: _choices}));
     }
 }

@@ -32,7 +32,7 @@ contract Proposal {
 
     address public creator;
     address public DAOaddress;
-    uint votingEndTime;
+    uint public votingEndTime;
 
     // This declares a state variable that
     // stores a `Voter` struct for each possible address.

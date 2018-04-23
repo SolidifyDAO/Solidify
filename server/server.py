@@ -202,7 +202,7 @@ def dao(h):
     response = requests.post('http://localhost:5001', json={'addresses': addresses, 'result': result})
     r = response.json()
     print(dao)
-    return render_template('dao.html', dao=dao, code=[])
+    return render_template('dao.html', dao=dao)
   return redirect(url_for('auth')+'?dao='+h)
 
 # should use 'flask run' instead
