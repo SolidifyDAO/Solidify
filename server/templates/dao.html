@@ -398,6 +398,8 @@
         const goalTime = $(this).data('time')
         const start = moment(new Date()) 
         const end = moment.unix(goalTime)
+        console.log(goalTime)
+        console.log(end.format())
         const diff = moment.duration(end.diff(start))
         const hours = Math.floor(diff.asHours())
         const minutes = diff.minutes()
@@ -547,7 +549,7 @@
           <div class="p-desc"><div class="p-desc-title">Description</div><br/>${proposalToShow.description}</div>
           <div class="p-choice-title">Choices</div>
           ${choices}
-          <div class="choice-code"><div class="p-code-title">Code to be executed</div><br/><pre><code>${Prism.highlight(proposalToShow.code, Prism.languages.javascript, 'javascript')}</code></div>
+          <div class="choice-code"><div class="p-code-title">Code to be executed</div><br/><pre><code>${Prism.highlight(proposalToShow.isAddRole ? addRoleCode : hireCode, Prism.languages.javascript, 'javascript')}</code></div>
         </div>
       `)
     }
