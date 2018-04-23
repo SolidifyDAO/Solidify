@@ -1,5 +1,6 @@
 var DAO = artifacts.require('./DAO.sol');
 var Role = artifacts.require('./Role.sol');
+var Proposal = artifacts.require('./Proposal.sol');
 
 function clArgs(index) {
   return process.argv[index + 4]
@@ -42,8 +43,18 @@ module.exports = async function(callback) {
   let name = await daoInstance.daoName()
   daoName = toString(name)
 
+  let numProposals = await daoInstance.getProposalCount()
+  for (j = 0; j < numProposals.toNumber(); j++) {
+    let proposalStruct = await daoInstance.proposals(j)
+    let proposalAddress = proposalStruct[0]
+    let proposalName = proposalStruct[1]
+    let proposalDescription = proposalStruct[2]
+    let proposalInstance = await Proposal.at(proposalAddress)
+    let voteEnd = await proposalInstance.votingEndTime()
+    proposalDict = {'name': toString(proposalName), 'description': toString(proposalDescription), 'end_time': voteEnd.toNumber(), 'address': proposalAddress, 'choices': []}
+    currentProposals.push(proposalDict)
+  }
 
-  // TODO: get proposals from DAO's proposal list
   var dao = {
     'name' : daoName,
     'dao_address' : daoAddress,

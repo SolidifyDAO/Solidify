@@ -1,4 +1,5 @@
 var Proposal = artifacts.require('./Proposal.sol');
+var DAO = artifacts.require('./DAO.sol');
 var AddMember = artifacts.require('./AddMember.sol');
 var AddRole = artifacts.require('./AddRole.sol');
 
@@ -13,6 +14,7 @@ module.exports = async function(deployer) {
   let choiceAddress = null;
   let daoAddress = newProposal['dao_address'];
   let votingEndTime = newProposal['voting_length'];
+
 
   // Hack to check proposal type until joe passes down an explicit 'type' param.
   newProposal['type'] = newProposal.hasOwnProperty('votes') ? 'AddRole' : 'HirePerson';
@@ -44,12 +46,7 @@ module.exports = async function(deployer) {
       memberAddress,
       memberName,
       memberRole
-    )/*.then(function(instance) {
-      console.log(instance.address);
-    }).catch(function(err) {
-      console.log('ERROR!');
-      console.log(err);
-    });*/
+    )
 
     choiceName = "Hire " + memberName
     choiceAddress = (await AddMember.deployed()).address
@@ -61,12 +58,14 @@ module.exports = async function(deployer) {
     [choiceAddress],
     votingEndTime,
     daoAddress
-  )/*.then(function(instance) {
-    console.log(instance.address);
-  }).catch(function(err) {
-    console.log('ERROR!');
-    console.log(err);
-  });*/
+  )
+
+  // add the proposal we created to the DAO
+  console.log("fack")
+  console.log(daoAddress)
+  let daoInstance = await DAO.at(daoAddress)
+  daoInstance.addProposal(instance.address, newProposal['name'], newProposal['description'], [choiceAddress])
+
   console.log(instance.address)
 
 };
