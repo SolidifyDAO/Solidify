@@ -255,6 +255,85 @@
   <script src="/static/prism.js"></script>
   <script>
     console.log('{{ dao | tojson }}')
+    const addRoleCode = `
+    pragma solidity ^0.4.16;
+
+    contract owned {
+        address public owner;
+
+        function owned()  public {
+            owner = msg.sender;
+        }
+
+        modifier onlyOwner {
+            require(msg.sender == owner);
+            _;
+        }
+
+        function transferOwnership(address newOwner) onlyOwner  public {
+            owner = newOwner;
+        }
+    }
+
+    contract DAO {
+        function addRole(uint _roleVotes, bytes32 _roleName) public;
+    }
+
+    contract AddRole is owned {
+      uint roleVotes;
+      bytes32 roleName;
+
+      function AddRole(uint _roleVotes, bytes32 _roleName) public {
+        roleVotes = _roleVotes;
+        roleName = _roleName;
+      }
+
+      function run(address DAOAddress) public {
+        DAO dao = DAO(DAOAddress);
+        dao.addRole(roleVotes, roleName);
+      }
+    }`
+
+    const hireCode = `
+    pragma solidity ^0.4.16;
+
+    contract owned {
+        address public owner;
+
+        function owned()  public {
+            owner = msg.sender;
+        }
+
+        modifier onlyOwner {
+            require(msg.sender == owner);
+            _;
+        }
+
+        function transferOwnership(address newOwner) onlyOwner  public {
+            owner = newOwner;
+        }
+    }
+
+    contract DAO {
+      function addMember(address _targetMember, bytes32 _memberName, bytes32 _roleName) public;
+    }
+
+    contract AddMember is owned {
+      address targetMember;
+      bytes32 memberName;
+      bytes32 roleName;
+
+      function AddMember(address _targetMember, bytes32 _memberName, bytes32 _roleName) public {
+        targetMember = _targetMember;
+        memberName = _memberName;
+        roleName = _roleName;
+      }
+
+      function run(address DAOAddress) public {
+        DAO dao = DAO(DAOAddress);
+        dao.addMember(targetMember, memberName, roleName);
+      }
+    }`
 
     /*const CHALLENGE_DESCRIPTION = "Authorization challenge"
     const CHALLENGE_VALUE = "from getline"
@@ -294,7 +373,6 @@
     })*/
 
     const daoData = JSON.parse('{{ dao | tojson }}')
-    const code = [decodeURIComponent(`{{ code1 | safe }}`), `{{ code2 | safe }}`]
     const proposals = daoData.proposals
     setInterval(function() {
       $(".timer").each(function() {
@@ -397,6 +475,10 @@
                 ${daoData.roles.map(({ name }) => `<option value=${name}>${name}</option>`).join("")}
               </select>
             </div>
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea class="form-control" id="description" name="description"></textarea>
+            </div>
             <input type="hidden" name="dao_address" value="${daoData.dao_address}">
             <small id="emailHelp" class="form-text text-muted">*Metamask setup is required to create proposals successfully</small><br>
             <button type="submit" class="btn">Create
@@ -432,7 +514,7 @@
           <div class="p-desc"><div class="p-desc-title">Description</div><br/>${proposalToShow.description}</div>
           <div class="p-choice-title">Choices</div>
           ${choices}
-          <div class="choice-code"><div class="p-code-title">Code to be executed</div><br/><pre><code>${Prism.highlight(code[index], Prism.languages.javascript, 'javascript')}</code></div>
+          <div class="choice-code"><div class="p-code-title">Code to be executed</div><br/><pre><code>${Prism.highlight(proposalToShow.code, Prism.languages.javascript, 'javascript')}</code></div>
         </div>
       `)
     }
@@ -462,6 +544,7 @@
                 vote_count: 0,
               }
             ]
+            data.code = addRoleCode
           } else {
             data.choices = [
               {
@@ -473,6 +556,7 @@
                 vote_count: 0,
               }
             ]
+            data.code = hireCode
           }
           console.log(data)
           daoData.proposals.push(data)
