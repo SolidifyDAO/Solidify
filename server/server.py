@@ -28,6 +28,7 @@ def auth():
 @app.route("/createDAO", methods=['POST'])
 def createDAO():
   daoData = request.get_json()
+  print(daoData)
   timestamp = str(datetime.now()).replace(" ", ":")
   dao_filepath = "".join(["../usergenerated/dao/dao-", timestamp, '.json'])
   with open(dao_filepath, 'w') as f:

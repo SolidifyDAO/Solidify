@@ -392,6 +392,8 @@
     const daoData = JSON.parse('{{ dao | tojson }}')
     const proposals = daoData.proposals
     const userAddr = web3.eth.accounts[0]
+    console.log(userAddr)
+    console.log(web3.eth.accounts[0])
     let curProposalAddr;
     setInterval(function() {
       $(".timer").each(function() {
@@ -625,25 +627,28 @@
       daoData.members.push({ name })
     }
     function sendVote(proposalAddr, index) {
-      console.log(proposalAddr)
-      const d = {
-        proposalAddr,
-        index,
-        userAddr,
-      }
-      $(".loading"+index).show()
-      $.ajax({
-        type: "POST",
-        url: 'sendVote',
-        data: JSON.stringify(d),
-        contentType: "application/json; charset=utf-8",
-        success: function(data) {
-          console.log(data)
-          $(`#${proposalAddr}_${index}`).text(data.updatedCount)
-          const p = proposals.find(proposal => proposal.address === proposalAddr)
-          p.choices[index].vote_count = data.updatedCount
-          $(".loading"+index).hide()
+      web3.eth.getAccounts((err, accounts) => {
+        const userAddr = accounts[0]
+        console.log(proposalAddr)
+        const d = {
+          proposalAddr,
+          index,
+          userAddr,
         }
+        $(".loading"+index).show()
+        $.ajax({
+          type: "POST",
+          url: 'sendVote',
+          data: JSON.stringify(d),
+          contentType: "application/json; charset=utf-8",
+          success: function(data) {
+            console.log(data)
+            $(`#${proposalAddr}_${index}`).text(data.updatedCount)
+            const p = proposals.find(proposal => proposal.address === proposalAddr)
+            p.choices[index].vote_count = data.updatedCount
+            $(".loading"+index).hide()
+          }
+        })
       })
     }
     function executeProposal(proposalAddr) {
