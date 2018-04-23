@@ -14,7 +14,6 @@ contract Role {
 
     function addMemberToRole(address _targetMember) public {
       roleMembers.push(_targetMember);
-      roleMembers.length++;
     }
 
     function removeMemberFromRole(address targetMember) public {

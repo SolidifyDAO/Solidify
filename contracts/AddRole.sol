@@ -18,22 +18,20 @@ contract owned {
 }
 
 contract DAO {
-  function addMember(address _targetMember, bytes32 _memberName, bytes32 _roleName) public;
+    function addRole(uint _roleVotes, bytes32 _roleName) public;
 }
 
-contract AddMember is owned {
-  address targetMember;
-  bytes32 memberName;
+contract AddRole is owned {
+  uint roleVotes;
   bytes32 roleName;
 
-  function AddMember(address _targetMember, bytes32 _memberName, bytes32 _roleName) public {
-    targetMember = _targetMember;
-    memberName = _memberName;
+  function AddRole(uint _roleVotes, bytes32 _roleName) public {
+    roleVotes = _roleVotes;
     roleName = _roleName;
   }
 
   function run(address DAOAddress) public {
     DAO dao = DAO(DAOAddress);
-    dao.addMember(targetMember, memberName, roleName);
+    dao.addRole(roleVotes, roleName);
   }
 }

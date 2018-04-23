@@ -102,6 +102,9 @@ contract DAO is owned {
       roleMap[_roleName] = r;
     }
 
+    function addRole(uint _roleVotes, bytes32 _roleName) public onlyProposalsOrDao {
+      addRole(distributionScheme, _roleVotes, _roleName);
+    }
     /**
      * Add member
      *

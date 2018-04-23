@@ -2,8 +2,9 @@ var Proposal = artifacts.require('../contracts/Proposal.sol')
 var DAO = artifacts.require('../contracts/DAO.sol')
 var Dummy = artifacts.require('../contracts/Dummy.sol')
 var AddMember = artifacts.require('../contracts/AddMember.sol')
+var AddRole = artifacts.require('../contracts/AddRole.sol')
 var Role = artifacts.require('../contracts/Role.sol')
-var choicesList = ['Nil Choice', 'Chocolate', 'Vanilla', 'Strawberry']
+var choicesList = ['Nil Choice', 'Chocolate', 'Vanilla', 'Strawberry', 'Pistachio']
 
 contract('Proposal', function(accounts) {
   let ProposalInstance = null
@@ -13,22 +14,29 @@ contract('Proposal', function(accounts) {
       'TestName',
       'FlatIndividual',
       ['employee'],
-      [5],
+      [1],
       [],
       [],
       [],
     )
-   DAOInstance.addMember(accounts[1], 'account1', 'employee')
+   for (i = 0; i < 5; i++) {
+    await DAOInstance.addMember(accounts[i + 1],
+                                'account' + (i + 1),
+                                'employee')
+   }
+
    tx = {from: accounts[1]}
    DummyInstance1 = await Dummy.new()
-   DummyInstance2 = await Dummy.new()
-   AddMemberInstance = await AddMember.new()
-   var dummyList = [DummyInstance1.address, DummyInstance2.address, AddMemberInstance.address]
-   var choicesListwoutNil = ['Chocolate', 'Vanilla', 'Strawberry']
+   AddMemberInstance1 = await AddMember.new(0x123, 'Joe Wang', 'employee')
+   AddMemberInstance2 = await AddMember.new(0x124, 'Hoe Wang', 'employee')
+   AddRoleInstance = await AddRole.new(10000, 'CEO')
+   var dummyList = [DummyInstance1.address, AddMemberInstance1.address, AddMemberInstance2.address, AddRoleInstance.address]
+   var choicesListwoutNil = ['Chocolate', 'Vanilla', 'Strawberry', 'Pistachio']
    ProposalInstance = await Proposal.new(choicesListwoutNil, dummyList, 0, DAOInstance.address)
   await DAOInstance.addProposal(ProposalInstance.address, 'MyProposal', 'MyProposalDesc', dummyList, tx)
   })
 
+  /* Voting logic tests */
   it("Should initialize poll with 0 votes correctly",  async() => {
     for (i = 0; i < choicesList.length; i++) {
       let choice = await ProposalInstance.choices(i)
@@ -39,19 +47,22 @@ contract('Proposal', function(accounts) {
   it("Should allow only whitelisted addresses to vote", async() => {
     let creator = await ProposalInstance.creator()
     var tx = {from: creator}
-    await ProposalInstance.giveRightToVote(accounts[1], tx)
 
     // send from an address that should be able to vote
     tx = {from: accounts[1]}
     await ProposalInstance.vote(0, tx)
     let voterWhoVoted = await ProposalInstance.voters(accounts[1])
-    assert.equal(voterWhoVoted[1], true)
+    assert.equal(voterWhoVoted[0], true)
 
-    // an address that shouldn't be able to vote
-    tx = {from: accounts[2]}
-    await ProposalInstance.vote(0, tx)
-    let voterWhoCantVote = await ProposalInstance.voters(accounts[2])
-    assert.equal(voterWhoVoted[2], false)
+    //an address that shouldn't be able to vote
+    tx = {from: accounts[7]}
+    try {
+      await ProposalInstance.vote(0, tx)
+    } catch (error) {
+      assert(error.message.search('revert') >= 1, true)
+    }
+    let voterWhoCantVote = await ProposalInstance.voters(accounts[7])
+    assert.equal(voterWhoCantVote[0], false)
   })
 
   it("Should not allow voting twice", async() => {
@@ -60,12 +71,11 @@ contract('Proposal', function(accounts) {
     assert.equal(choiceNoVotes[1], 0)
 
     // Creator votes for choice 0.
-    let creator = await ProposalInstance.creator()
-    var tx = {from: creator}
+    var tx = {from: accounts[1]}
     await ProposalInstance.vote(0, tx)
 
     let choiceVoteOnce = await ProposalInstance.choices(0)
-    assert.equal(choiceVoteOnce[1], 1)
+    assert.equal(choiceVoteOnce[1].toNumber(), 1)
 
     // Creator tries to vote for choice 0 again. Should revert.
     try {
@@ -75,26 +85,9 @@ contract('Proposal', function(accounts) {
     }
   })
 
-  it("Should vote based on weight", async() => {
-    // creator votes for option 1
-    let creator = await ProposalInstance.creator()
-    var tx = {from: creator}
-    await ProposalInstance.vote(0, tx)
-    let choiceVoteOnce = await ProposalInstance.choices(0)
-    assert.equal(choiceVoteOnce[1], 1)
-
-    // another account is given a weight of 5 and votes for option 2
-    await ProposalInstance.giveRightToVote(accounts[1], tx)
-    await ProposalInstance.setWeight(accounts[1], 5, tx)
-    tx = {from: accounts[1]}
-    await ProposalInstance.vote(1, tx)
-    let choiceVoteWeigted5 = await ProposalInstance.choices(1)
-    assert.equal(choiceVoteWeigted5[1], 5)
-  })
-
   it("Should only be able to vote for valid options", async() => {
     let creator = await ProposalInstance.creator()
-    var tx = {from: creator}
+    var tx = {from: accounts[1]}
     // voting for an index == num of options
     try {
       await ProposalInstance.vote(choicesList.length + 1, tx)
@@ -112,11 +105,9 @@ contract('Proposal', function(accounts) {
 
   it("Should calculate the results correctly", async() => {
     // sets up 5 accounts to vote on a random choice.
-    let creator = await ProposalInstance.creator()
-    var tx = {from: creator}
+    var tx = {from: accounts[1]}
     var votes = []
     for (i = 0; i < 5; i++) {
-      await ProposalInstance.giveRightToVote(accounts[i + 1], tx)
       var choiceIndex = Math.floor(Math.random() * choicesList.length)
       await ProposalInstance.vote(choiceIndex , {from: accounts[i + 1]})
       votes.push(choiceIndex)
@@ -125,13 +116,10 @@ contract('Proposal', function(accounts) {
     computedWinner = choicesList[computeMode(votes)]
     assert.equal(toString(winner), computedWinner)
   })
+
+  /* Choice Contract Tests */
   it("Should check that dummy increments1", async() => {
     // sets up 5 accounts to vote on a random choice.
-    let creator = await ProposalInstance.creator()
-    var tx = {from: creator}
-    var votes = []
-    let choiceIndex = 1
-    await ProposalInstance.vote(choiceIndex, tx)
     assert(await DummyInstance1.i(), 0)
     await DummyInstance1.run(await DAOInstance.address)
     assert(await DummyInstance1.i(), 1)
@@ -139,10 +127,9 @@ contract('Proposal', function(accounts) {
   it("Should check that dummy increments2", async() => {
     // sets up 5 accounts to vote on a random choice.
     let creator = await ProposalInstance.creator()
-    var tx = {from: creator}
+    var tx = {from: accounts[1]}
     var votes = []
     let choiceIndex = 1
-    //await assert.equal(toString(winner), 0)
     await ProposalInstance.vote(choiceIndex, tx)
     votes.push(choiceIndex)
     let winner = await ProposalInstance.findWinner.call()
@@ -157,7 +144,7 @@ contract('Proposal', function(accounts) {
     let creator = await ProposalInstance.creator()
     var tx = {from: creator}
 
-    await AddMemberInstance.run(await DAOInstance.address)
+    await AddMemberInstance1.run(await DAOInstance.address)
 
     let memberJoe = await DAOInstance.members('0x123')
     assert.equal(toString(memberJoe[2]), 'Joe Wang')
@@ -170,8 +157,42 @@ contract('Proposal', function(accounts) {
     let creator = await ProposalInstance.creator()
     var tx = {from: creator}
     var votes = []
-    ADD_MEMBER_INDEX = 3
-    await ProposalInstance.giveRightToVote(accounts[1], tx)
+    ADD_MEMBER_INDEX = 2
+    await ProposalInstance.vote(ADD_MEMBER_INDEX , {from: accounts[1]})
+    votes.push(ADD_MEMBER_INDEX)
+    let winner = await ProposalInstance.findWinner.call()
+    await ProposalInstance.executeWinner()
+    let winnerRunnableAddress = await ProposalInstance.findWinnerRunnable.call()
+    let winnerRunnable = await AddMember.at(winnerRunnableAddress)
+    assert.equal(toString(winner), choicesList[computeMode(votes)])
+
+    // same as in above test
+    let memberJoe = await DAOInstance.members('0x123')
+    assert.equal(toString(memberJoe[2]), 'Joe Wang')
+		let roleInstance = await Role.at(memberJoe[0]) // *This is how you get a contract instance at a specific address!
+    let roleName = await roleInstance.getRoleName()
+    assert.equal(toString(roleName), 'employee')
+  })
+
+  it("Should check that a role is added on proposal resolution", async() => {
+    let creator = await ProposalInstance.creator()
+    var tx = {from: creator}
+
+    await AddRoleInstance.run(await DAOInstance.address)
+
+    let roleCEO = await DAOInstance.roleMap('CEO')
+		let roleInstance = await Role.at(roleCEO) // *This is how you get a contract instance at a specific address!
+    let roleName = await roleInstance.getRoleName()
+    assert.equal(toString(roleName), 'CEO')
+    let roleVotes = await roleInstance.getVotes()
+    assert.equal(roleVotes.toNumber(), 10000)
+  })
+  it("Should check that a member is added on proposal resolution", async() => {
+    // sets up 5 accounts to vote on a random choice.
+    let creator = await ProposalInstance.creator()
+    var tx = {from: creator}
+    var votes = []
+    ADD_MEMBER_INDEX = 2
     await ProposalInstance.vote(ADD_MEMBER_INDEX , {from: accounts[1]})
     votes.push(ADD_MEMBER_INDEX)
     let winner = await ProposalInstance.findWinner.call()
@@ -207,4 +228,3 @@ function computeMode(arr) {
 function toString(str) {
   return web3.toAscii(str).replace(/\u0000/g, '');
 }
-

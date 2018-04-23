@@ -1,9 +1,26 @@
 pragma solidity ^0.4.16;
 
-//tricky
+import "contracts/DAO.sol";
+import "contracts/Role.sol";
+
 contract Runnable {
   function run(address DAOaddr) public;
 }
+
+//contract Role {
+//  function getVotes() public returns (uint);
+//}
+//
+//contract DAO {
+//  struct Member {
+//      Role role;
+//      address member;
+//      bytes32 name;
+//  }
+//
+//  mapping(address => Member) public members;
+//}
+
 
 /// @title Voting with delegation.
 contract Proposal {
@@ -11,9 +28,14 @@ contract Proposal {
     // be used for variables later.
     // It will represent a single voter.
     struct Voter {
-        uint weight; // weight is based on group membership
         bool voted;  // if true, that person already voted
         uint vote;   // index of the voted proposal
+    }
+
+    struct Member {
+        Role role;
+        address member;
+        bytes32 name;
     }
 
     // This is a type for a single choice.
@@ -38,7 +60,6 @@ contract Proposal {
     /// Create a new proposal to choose one of choices.
     function Proposal(bytes32[] choiceNames, address[] choiceContracts, uint _votingEndTime, address _DAOaddress) public {
         creator = msg.sender;
-        voters[creator].weight = 1;
         votingEndTime = _votingEndTime;
         DAOaddress = _DAOaddress;
         /// Every contract should have a nil choice
@@ -63,33 +84,11 @@ contract Proposal {
         }
     }
 
-    // TODO: Just used for testing for now, might need to be used for delegation schemes?
-    function setWeight(address voter, uint weight) public {
-        require(
-            (msg.sender == creator) &&
-            !voters[voter].voted
-        );
-        voters[voter].weight = weight;
-    }
-
-    // Give `voter` the right to vote on this ballot.
-    // May only be called by `creator`.
-    // TODO: Parameter should be a group of addresses to give rights to vote to
-    function giveRightToVote(address voter) public {
-        // If the argument of `require` evaluates to `false`,
-        // it terminates and reverts all changes to
-        // the state and to Ether balances. It is often
-        // a good idea to use this if functions are
-        // called incorrectly. But watch out, this
-        // will currently also consume all provided gas
-        // (this is planned to change in the future).
-        require(
-            (msg.sender == creator) &&
-            !voters[voter].voted &&
-            (voters[voter].weight == 0)
-        );
-        // TODO: Group passed in will have a computeWeight() function
-        voters[voter].weight = 1;
+    function checkVotingPower(address voter) public view returns (uint _votingPower) {
+        Role memberRole;
+        DAO dao = DAO(DAOaddress);
+        (memberRole, ,)= dao.members(voter);
+        _votingPower = memberRole.getVotes();
     }
 
 
@@ -98,19 +97,21 @@ contract Proposal {
     function vote(uint choice_index) public {
         Voter storage sender = voters[msg.sender];
         require(!sender.voted);
+
+        DAO dao = DAO(DAOaddress);
+        address voterAddr;
+        (, voterAddr,) = dao.members(msg.sender);
+        require(voterAddr != address(0));
         sender.voted = true;
         sender.vote = choice_index;
 
-        // If `choice_index` is out of the range of the array,
-        // this will throw automatically and revert all
-        // changes.
-        choices[choice_index].voteCount += sender.weight;
+        choices[choice_index].voteCount += checkVotingPower(msg.sender);
     }
 
     /// @dev Computes the winning choice taking all
     /// previous votes into account.
     // TODO: Figure out how to resolve ties
-    function winningChoice() public view returns (uint winningChoice_) 
+    function winningChoice() public view returns (uint winningChoice_)
     {
         uint winningVoteCount = 0;
         for (uint c = 0; c < choices.length; c++) {
@@ -126,7 +127,7 @@ contract Proposal {
         winnerName_ = choices[winningChoice()].name;
     }
 
-    function findWinnerRunnable() public view returns (address winnerRunnable_) 
+    function findWinnerRunnable() public view returns (address winnerRunnable_)
     {
         winnerRunnable_ = choices[winningChoice()].runnable;
     }
