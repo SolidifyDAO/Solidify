@@ -239,6 +239,10 @@
       padding: 15px 20px;
       margin-top: 10px;
     }
+    .winner {
+      background-color: #eee;
+      font-size: 25px;
+    }
   </style>
 </head>
 <body scroll="no">
@@ -388,6 +392,7 @@
     const daoData = JSON.parse('{{ dao | tojson }}')
     const proposals = daoData.proposals
     const userAddr = web3.eth.accounts[0]
+    let curProposalAddr;
     setInterval(function() {
       $(".timer").each(function() {
         const goalTime = $(this).data('time')
@@ -401,7 +406,7 @@
           $(this).removeClass('timer')
           $(this).addClass('execute-btn-div')
           $(this).html(`
-            <button class="btn execute-btn">Execute
+            <button onclick="executeProposal('${curProposalAddr}')" class="btn execute-btn">Execute
               <span class="loading"><i class="fas fa-spinner fa-spin"></i>
             </button>
            `)
@@ -517,6 +522,7 @@
     }
 
     function showProposal(address) {
+      curProposalAddr = address
       const index = proposals.findIndex(proposal => proposal.address === address)
       const proposalToShow = proposals[index]
       // let total = 0
@@ -524,7 +530,7 @@
       const choices = `
         <div class="p-choice-container">
           ${proposalToShow.choices.map(({ name, vote_count }, index) => 
-            `<div class="choice-container">
+            `<div class="choice-container" id="${address}_${index}_dab">
               <div class="choice-name"><b>${name}</b></div>
               <div class="choice-votes"><span id="${address}_${index}">${vote_count}</span> votes</div>
               <button type="button" class="btn big" onclick="sendVote('${proposalToShow.address}', ${index})">Vote
@@ -586,7 +592,6 @@
             data.code = hireCode
           }
           data.end_time = end_time
-          console.log(data)
           daoData.proposals.push(data)
           $("#proposals-list").append(
             `<div class="proposal" onclick="showProposal('${addr}')">${data.name}</div>`
@@ -623,11 +628,25 @@
       $.ajax({
         type: "POST",
         url: 'sendVote',
-        dataType: 'json',
-        data: d,
+        data: JSON.stringify(d),
+        contentType: "application/json; charset=utf-8",
         success: function(data) {
+          console.log(data)
           $(`#${proposalAddr}_${index}`).text(data.updatedCount)
           $(".loading"+index).hide()
+        }
+      })
+    }
+    function executeProposal(proposalAddr) {
+      $(".loading").show()
+      $.ajax({
+        type: "POST",
+        url: 'executeProposal',
+        data: JSON.stringify({ proposalAddress: proposalAddr }),
+        contentType: "application/json; charset=utf-8",
+        success: function(data) {
+          $(`#${proposalAddr}_${data.winningChoiceIdx}_dab`).addClass('winner')
+          $(".loading").hide()
         }
       })
     }
