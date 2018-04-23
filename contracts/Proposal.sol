@@ -7,22 +7,6 @@ contract Runnable {
   function run(address DAOaddr) public;
 }
 
-//contract Role {
-//  function getVotes() public returns (uint);
-//}
-//
-//contract DAO {
-//  struct Member {
-//      Role role;
-//      address member;
-//      bytes32 name;
-//  }
-//
-//  mapping(address => Member) public members;
-//}
-
-
-/// @title Voting with delegation.
 contract Proposal {
     // This declares a new complex type which will
     // be used for variables later.

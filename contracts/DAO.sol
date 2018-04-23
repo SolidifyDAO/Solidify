@@ -24,6 +24,8 @@ contract DAO is owned {
     bytes32 public distributionScheme;
     bytes32 public daoName;
     Proposal[] public proposals;
+    address[] public memberAddrs;
+    bytes32[] public roleNames;
 
     mapping(address => Member) public members;
     mapping(bytes32 => Role) public roleMap;
@@ -100,10 +102,19 @@ contract DAO is owned {
         r = new RolePercentageBased(_roleVotes, _roleName);
       }
       roleMap[_roleName] = r;
+      roleNames.push(_roleName);
     }
 
     function addRole(uint _roleVotes, bytes32 _roleName) public onlyProposalsOrDao {
       addRole(distributionScheme, _roleVotes, _roleName);
+    }
+
+    function getMemberCount() public view returns (uint) {
+        return memberAddrs.length;
+    }
+
+    function getRoleCount() public view returns (uint) {
+        return roleNames.length;
     }
     /**
      * Add member
@@ -120,6 +131,7 @@ contract DAO is owned {
 
       // create the new member in our members map
       members[_targetMember] = Member({role: roleOfMember, member: _targetMember, name: _memberName});
+      memberAddrs.push(_targetMember);
     }
 
   /**
@@ -133,6 +145,13 @@ contract DAO is owned {
 
       member.role.removeMemberFromRole(targetMember);
       delete members[targetMember];
+      // remove member address from address list
+      for (uint i = 0; i < memberAddrs.length - 1; i++) {
+        if (memberAddrs[i] == targetMember) {
+            memberAddrs[i] = memberAddrs[i + 1];
+         }
+         memberAddrs.length--;
+      }
       return member;
     }
 

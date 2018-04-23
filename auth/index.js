@@ -26,7 +26,6 @@ app.get('/', (req, res) => res.send('hello world'))
 app.post('/', (req, res) => {
   console.log('fdsafsa')
   console.log(req.body)
-  console.log(req.body)
   const recovered = sigUtil.recoverTypedSignature({ data: msgParams, sig: req.body.result })
   const match = req.body.addresses.find((address) => recovered === address)
   if (match) {

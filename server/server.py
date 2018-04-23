@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime
 from pprint import pformat
 import os
 import subprocess
 from flask import jsonify
 import json
+import simplejson
+import requests
 
 app = Flask(__name__)
 
@@ -17,6 +19,11 @@ urls = {}
 @app.route("/")
 def hello():
   return render_template('entry.html')
+
+@app.route("/auth")
+def auth():
+  dao = request.args.get('dao')
+  return render_template('auth.html', dao=dao)
 
 @app.route("/createDAO", methods=['POST'])
 def createDAO():
@@ -42,6 +49,17 @@ def createProposal():
   print(proposalData)
   return "nice."
 
+@app.route("/sendVote", methods=['POST'])
+def sendVote():
+  voteInfo = request.get_json()
+  timestamp = str(datetime.now()).replace(" ", ":")
+  vote_filepath = "".join(["../usergenerated/vote/vote-", timestamp, '.json'])
+  with open(vote_filepath, 'w') as f:
+    f.write(json.dumps(voteInfo, indent=4))
+  updated_count = run_vote_script([vote_filepath])
+  return jsonify({'updatedCount': updated_count})
+
+
 def run_deployment_script(script_name, args_list):
   print(os.getcwd())
   old_path = "".join(["../notmigrations/", script_name])
@@ -51,6 +69,11 @@ def run_deployment_script(script_name, args_list):
   addr = output.decode().split('\n')[-2]
   os.rename(new_path, old_path)
   return addr
+
+def run_vote_script(args_list):
+  output = subprocess.check_output(" ".join(["truffle exec ../notmigrations/voteScript.js"] + args_list), shell=True)
+  vote_count = output.decode().split('\n')[-2]
+  return vote_count
 
 @app.route("/tempdao")
 def tempdao():
@@ -126,11 +149,9 @@ contract AddMember is owned {
   roles = [{
     'name': 'Role1',
     'voting_power': 10,
-    'description': 'fdsafsfsafdsa'
   }, {
     'name': 'Role2',
     'voting_power': 15,
-    'description': 'ok then'
   }]
 
   dao = {
@@ -142,12 +163,35 @@ contract AddMember is owned {
 
   print(dao)
 
-  return render_template('dao.html', dao=dao, code1=code[0], code2=code[1])
+  return render_template('dao.html', dao=dao, code=code)
+
+'''@app.route("/verify")
+def verify():
+  dao = request.args.get('dao')
+  result = request.args.get('result')
+  # TODO: get real addresses from dao
+  addresses = ['0x492b173e4bde8c8b225a8df4dc6fdecdf5af1c1a']
+  response = requests.post('http://localhost:5001', json={'addresses': addresses, 'result': result})
+  r = response.json()
+  print(r)
+  return redirect('/'+dao)'''
 
 @app.route("/<string:h>")
 def dao(h):
   addr = urls[h]
-  return addr
+  output = subprocess.check_output(" ".join(["truffle exec ../notmigrations/buildFrontend.js"] + [addr]), shell=True).split('\n')
+  output = output[2:-1][0]
+  print output
+  dao = json.loads(output)
+  result = request.args.get('result')
+  if (result):
+    # TODO: get real addresses from dao
+    addresses = []
+    response = requests.post('http://localhost:5001', json={'addresses': addresses, 'result': result})
+    r = response.json()
+    print(r)
+    return render_template('dao.html', dao=dao, code=[])
+  return redirect(url_for('auth')+'?dao='+h)
 
 # should use 'flask run' instead
 if __name__ == '__main__':
