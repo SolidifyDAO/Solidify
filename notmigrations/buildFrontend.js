@@ -51,7 +51,7 @@ module.exports = async function(callback) {
     'roles' : currentRoles,
     'members' : currentMembers
   }
-  console.log(dao)
+  console.log(JSON.stringify(dao))
 };
 
 
