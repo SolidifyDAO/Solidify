@@ -158,13 +158,20 @@
 
     .p-choice-container {
       font-size: 18px;
-      margin-top: 50px;
+      margin-top: 25px;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
     }
 
     .choice-container {
       text-align: center;
-      border-top: 1px solid #ddd;
-      padding: 20px 0px;
+      /* border-left: 1px solid #ddd; */
+      padding: 20px 35px;
+      font-size: 22px;
+    }
+    .big {
+      padding: 15px 20px;
     }
 
     .choice-container button {
@@ -172,7 +179,7 @@
     }
 
     .choice-container:last-of-type {
-      border-bottom: 1px solid #ddd;
+      /* border-right: 1px solid #ddd; */
     }
 
     button {
@@ -378,7 +385,7 @@
             `<div class="choice-container">
             <div class="choice-name"><b>${name}</b></div>
             <div class="choice-votes">${vote_count} votes (${Math.round(vote_count/total * 100)}%)</div>
-            <button type="button" class="btn">Vote</button>
+            <button type="button" class="btn big">Vote</button>
             </div>`
           ).join("")}
         </div>
