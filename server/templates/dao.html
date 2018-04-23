@@ -663,7 +663,7 @@
           $(`#${proposalAddr}_${data.winningChoiceIdx}_dab`).addClass('winner')
           $(".loading").hide()
           $('button').attr("disabled","disabled")
-          if (data.winningChoiceIdx === 1) {
+          if (data.winningChoiceIdx !== "0") {
             if (p.isAddRole) {
               addRole(p.name)
             } else {
