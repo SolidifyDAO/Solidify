@@ -48,6 +48,17 @@ def createProposal():
   print(proposalData)
   return "nice."
 
+@app.route("/sendVote", methods=['POST'])
+def sendVote():
+  voteInfo = request.get_json()
+  timestamp = str(datetime.now()).replace(" ", ":")
+  vote_filepath = "".join(["../usergenerated/vote/vote-", timestamp, '.json'])
+  with open(vote_filepath, 'w') as f:
+    f.write(json.dumps(voteInfo, indent=4))
+  updated_count = run_vote_script([vote_filepath])
+  return jsonify({'updatedCount': updated_count})
+
+
 def run_deployment_script(script_name, args_list):
   print(os.getcwd())
   old_path = "".join(["../notmigrations/", script_name])
@@ -57,6 +68,11 @@ def run_deployment_script(script_name, args_list):
   addr = output.decode().split('\n')[-2]
   os.rename(new_path, old_path)
   return addr
+
+def run_vote_script(args_list):
+  output = subprocess.check_output(" ".join(["truffle exec voteScript.js"] + args_list), shell=True)
+  vote_count = output.decode().split('\n')[-2]
+  return vote_count
 
 @app.route("/tempdao")
 def tempdao():
