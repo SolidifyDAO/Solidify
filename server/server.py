@@ -40,7 +40,9 @@ def createDAO():
 @app.route("/createProposal", methods=['POST'])
 def createProposal():
   print(request.form)
-  proposalData = request.form
+  proposalData = request.form.to_dict()
+  proposalData['voting_length'] = time.time() + float(proposalData['voting_length']) * 3600
+  proposalData['isAddRole'] = 'votes' in proposalData
   timestamp = str(datetime.now()).replace(" ", ":")
   proposal_filepath = "".join(["../usergenerated/proposal/proposal-", timestamp, '.json'])
   with open(proposal_filepath, 'w') as f:
