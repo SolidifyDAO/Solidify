@@ -443,6 +443,20 @@
       font-weight: bold;
     }
 
+    #loading {
+      display: none;
+    }
+
+    #url-title {
+      font-size: 65px;
+      font-weight: 700;
+      letter-spacing: .03em;
+    }
+
+    #url-link {
+      font-size: 50px;
+    }
+
   </style>
 </head>
 <body scroll="no">
@@ -607,8 +621,19 @@
           <i class="far fa-edit"></i> Edit Members (<span class="members_num_fill"></span>)
         </a>
       </div>
-      <button id="confirm_btn" class="green_btn big">Confirm</button>
+      <button id="confirm_btn" class="green_btn big">
+        Confirm
+        <span id="loading"><i class="fas fa-spinner fa-spin"></i></div>
+      </button>
     </div>
+  </div>
+  <div class="page">
+      <span id="url-title">
+        DAO created at url:
+      </span>
+      <br/>
+      <a id="url-link" href="#">localhost:5000/<span class="url-fill"></span></a>
+      </span>
   </div>
   <script>
     var daoData = {
@@ -706,13 +731,19 @@
       $("#editMembers").click(() => changePage(4))
       $("#editRoles").click(() => changePage(3))
       $("#confirm_btn").click(() => {
+        $('#loading').show()
         $.ajax({
           url: '/createDAO',
           type: 'post',
           contentType: 'application/json; charset=utf-8',
           data: JSON.stringify(daoData),
           success: function(data) {
-            console.log("SUCCESSFUL REQUEST")
+            console.log(data)
+            const addr = data.addr
+            $('#loading').hide()
+            $('.url-fill').text(addr)
+            $('#url-link').attr('href', 'https://localhost:5000/' + addr)
+            nextPage()
           }
         })
       })

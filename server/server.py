@@ -12,6 +12,8 @@ app.config.update(
   DEBUG=True,
   TEMPLATES_AUTO_RELOAD=True)
 
+urls = {}
+
 @app.route("/")
 def hello():
   return render_template('entry.html')
@@ -24,7 +26,9 @@ def createDAO():
   with open(dao_filepath, 'w') as f:
     f.write(json.dumps(daoData, indent=4))
   addr = run_deployment_script('2_createDAO.js', [dao_filepath])
-  return jsonify({'addr': addr})
+  h = addr[2:10]
+  urls[h] = addr
+  return jsonify({'addr': h})
 
 @app.route("/createProposal", methods=['POST'])
 def createProposal():
@@ -38,7 +42,7 @@ def run_deployment_script(script_name, args_list):
   new_path = "".join(["../migrations/", script_name])
   os.rename(old_path, new_path)
   output = subprocess.check_output(" ".join(["truffle migrate --reset"] + args_list), shell=True)
-  addr = output.split('\n')[-2]
+  addr = output.decode().split('\n')[-2]
   os.rename(new_path, old_path)
   return addr
 
