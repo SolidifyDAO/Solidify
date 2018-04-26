@@ -1,54 +1,39 @@
-[![Build Status](https://travis-ci.org/SolidifyDAO/Solidify.svg?branch=master)](https://travis-ci.org/SolidifyDAO/Solidify)
+# Solidify
+So easy even your grandma could make a DAO!
 
-TODO
-- Define how voting works for a given role
-- Incorporate role assignment to 
+## Setup
+### Requirements
 
-SCHEMES
-- Flat amount, individual: Adding new person costs everyone else
-- Flat amount, group: Adding new person costs everyone else in group
-- Percentage based,
+Setting up Solidify requires you to have [Truffle](http://truffleframework.com/docs/getting_started/installation) and [ganache-cli](https://github.com/trufflesuite/ganache-cli) setup on your machine.
 
-Modularize
-- Token Distribution scheme
-- Voting
-- Roles
-- Proposals
-- Members
+To authenticate through the application, you also need the chrome extension [MetaMask](https://metamask.io/).
 
-Role???
+Running local servers also required Python3 and Node.
 
-role needs to be picked beforehand
+### Quick Start
 
------- token dist
+First ensure that you have the following directory paths in the root directory (this is where files will be stored):
 
-SCHEMES
-- Flat amount, individual: Adding new person costs everyone else
-- Flat amount, group: Adding new person costs everyone else in group
-- Percentage based,
+* `usergenerated/dao/`
+* `usergenerated/proposal/`
+* `usergenerated/vote/`
 
-Member has a role, when a vote is happening, 
-role is checked and role refer to token dist scheme for logic on how to calc
+In the server/ directory, install the required dependencies using:
 
+`pip install -r requirements.txt`
 
-ROLE
-- getVotes()
-    make fn call to token dist scheme:
-      flat, ind: role has a number represeting how much an individual gets, return this number
-      flat, group: role has a number, return number / group.size
-      percentage based: role has a decimal, return global_dao_tokens * decimal.
+Next, turn on the Flask server using python3:
 
+`python3 server.py`
 
+Turn on ganache-cli and, to unlock accounts for transactions, run it with the following flag replacing the list with your secret key:
 
+`ganache-cli -m "concert load couple harbor equip island argue ramp clarify fence smart topic"`
 
+Finally, you need to run a local node server for authentication. Move to the auth directory and run:
 
-function addMember(address targetMember, Role role, string memberName) onlyOwner public {
-  give the member tokens
-  store the member somewhere
-}
+`npm install`
 
-Role has voting power, so when voting check their role
+`node index.js`
 
-
-
-- each person associated with a single role
+The application should be viewable at http://localhost:5000/
